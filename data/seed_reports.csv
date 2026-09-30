@@ -1,0 +1,151 @@
+category,text
+security,Someone propped open the server room door with a chair and it stayed open all weekend
+security,An unknown USB drive was found plugged into the reception computer this morning
+security,The biometric lock on the data center floor has been malfunctioning for three days
+security,A visitor was seen photographing employee badges near the security desk
+security,The office alarm did not arm last night and the panel showed a fault code
+security,Ex-employee access cards were never revoked after the layoffs last month
+security,Someone is sharing the VPN credentials in a group chat instead of using personal logins
+security,The CCTV camera covering the parking exit has been offline since Tuesday
+security,A phishing email pretending to be from IT asked staff for their passwords
+security,The fire exit on the third floor is blocked by stacked boxes and furniture
+security,Cleaning staff were let into the finance office without any escort yesterday
+security,The backup tapes are stored in an unlocked cabinet in the hallway
+security,An intern was given administrator access to production servers on day one
+security,The entry log shows the building was accessed at 3am with a master key
+security,Our customer database export was emailed to a personal gmail address
+security,The new contractor never returned the office keys after the project ended
+harassment,My team lead repeatedly makes demeaning comments about my appearance in meetings
+harassment,A coworker keeps sending me unwanted personal messages after work hours
+harassment,Someone is spreading humiliating rumors about a colleague in the lunch group
+harassment,My supervisor threatens to cut my shifts whenever I refuse to work late
+harassment,A senior keeps shouting and using abusive language during code reviews
+harassment,Unwelcome physical contact happened twice at the office party last Friday
+harassment,My manager mocks my accent in front of clients and calls it a joke
+harassment,Someone created a meme page targeting a junior designer with cruel edits
+harassment,I was excluded from all team outings after reporting a missed deadline
+harassment,A colleague reads my private chats aloud whenever I leave my desk unlocked
+harassment,My performance review was downgraded after I declined dinner invitations
+harassment,Verbal threats were made during an argument in the warehouse break room
+harassment,Someone keeps moving my belongings and hiding my work tools every week
+harassment,Inappropriate jokes about my religion are a daily occurrence in my team
+harassment,My shift supervisor demands favors in exchange for approving my leave
+harassment,Repeated staring and following me to the parking lot after evening shifts
+corruption,A vendor was awarded the contract without any bidding process or quotes
+corruption,The purchase invoices show inflated prices compared to the market rate
+corruption,Someone in procurement receives expensive gifts from a supplier every quarter
+corruption,Expense claims include restaurant bills for meetings that never happened
+corruption,A manager hired an unqualified relative for a high-paying consultant role
+corruption,The tender evaluation scores were changed after the committee had signed
+corruption,Office supplies budget doubled while actual stock in the store room shrank
+corruption,A contractor is billing for ten workers but only four show up on site
+corruption,The finance officer approved his own travel reimbursement without review
+corruption,Quality inspection reports are being signed without any actual site visit
+corruption,Someone sold company laptops and reported them as damaged beyond repair
+corruption,The recruitment shortlist was replaced with names favoring one community
+corruption,Fuel bills for the company vehicles far exceed the logged trip distances
+corruption,A supplier was paid in full before delivering any of the ordered goods
+corruption,Cash collected at the event counter does not match the receipt book totals
+corruption,The audit files for last quarter went missing right before the inspection
+technical,The production database crashes every night during the scheduled backup window
+technical,The deployment pipeline has been failing on the payment service for a week
+technical,API response times spike to thirty seconds whenever traffic doubles
+technical,The mobile app logs users out randomly and loses their unsaved form data
+technical,SSL certificate expired on the staging server and nobody received an alert
+technical,The search index returns stale results hours after content is updated
+technical,Memory usage on the cache server grows until it needs a manual restart
+technical,The email notification worker silently drops every fifth message in queue
+technical,Database migrations fail on fresh installs because of a missing seed file
+technical,The dashboard charts show wrong totals when filtered by date range
+technical,File uploads larger than ten megabytes fail without any error message
+technical,The authentication service rejects valid tokens after daylight saving changes
+technical,Background jobs pile up and never complete after each weekend deploy
+technical,The load balancer sends traffic to a server that was decommissioned
+technical,Push notifications stopped working on android devices after the update
+technical,The reporting module times out when exporting more than a thousand rows
+other,The cafeteria food quality has dropped sharply over the past two months
+other,The office washrooms on the second floor are not cleaned for days at a time
+other,The air conditioning in the east wing has not worked all summer
+other,There is no proper drinking water on the fourth floor for three weeks now
+other,The parking lot lights stay off at night making it unsafe to walk to cars
+other,The elevator gets stuck between floors at least twice every single week
+other,The suggestion box has not been opened or reviewed in over six months
+other,The office internet slows to a crawl every afternoon around three o clock
+other,There are not enough chairs in the meeting rooms for the scheduled reviews
+other,The night shift transport arrives over an hour late almost every day
+other,The pantry microwave has been broken and sparking since last month
+other,Stray dogs enter through the broken back gate and roam the campus freely
+other,The library computers still run an operating system from ten years ago
+other,The reception area has no seating for visitors waiting for interviews
+other,The gym equipment is rusted and several machines are missing safety pins
+other,The hostel water heaters fail every morning during peak hours
+security,The main gate access register has missing entries for the entire night shift
+security,Someone copied files from the HR computer onto a personal pen drive
+security,The firewall logs show repeated login attempts from an unknown foreign IP
+security,A stranger tailgated through the turnstile behind an employee this morning
+security,The locker room master key went missing and the lock was never changed
+security,Confidential salary sheets were left on the shared office printer overnight
+security,The security guard post was empty for the whole weekend shift
+security,An unauthorized drone was seen hovering over the factory premises twice
+security,The antivirus license expired on all branch office computers last month
+security,Someone disabled the motion sensors in the warehouse before the theft
+security,The backup server password is written on a sticky note on the monitor
+security,A fake courier collected a parcel containing signed company cheques
+security,The badge reader at the research lab entrance has been taped open
+security,Sensitive client contracts were found in an unlocked desk drawer
+harassment,My supervisor sends threatening texts whenever I take approved sick leave
+harassment,A colleague groped me in the crowded elevator during lunch hour
+harassment,The team lead calls me useless and stupid in front of new trainees
+harassment,Someone posted my personal phone number in a public office group
+harassment,My boss demands I stay back alone with him after everyone leaves
+harassment,A coworker stalks my social media and comments on every single photo
+harassment,I receive abusive late-night calls from an unknown number after shifts
+harassment,The foreman touches female workers inappropriately near the machinery
+harassment,My manager threatened to fire me if I complained about his behavior
+harassment,Humiliating videos of an apprentice are being circulated among staff
+harassment,A senior pressures juniors for dates and punishes those who refuse
+harassment,Racial slurs are painted on my locker and nobody removes them
+harassment,My team isolates and ignores everything I say in group discussions
+harassment,The contractor whistles and passes lewd remarks at women workers daily
+corruption,The tender was awarded to a bidder who quoted double the estimated cost
+corruption,A purchase officer takes monthly kickbacks from the stationery vendor
+corruption,Fake fuel receipts worth thousands are claimed by the transport desk
+corruption,The contractor used substandard cement while billing for premium grade
+corruption,An official demanded a bribe to clear our factory license renewal
+corruption,Ghost employees on the payroll collect salaries every single month
+corruption,The canteen contractor overbills meals that were never actually served
+corruption,Someone forged the director signature to approve a large payment
+corruption,The land valuation was deliberately lowered to favor a private buyer
+corruption,Seasonal bonus funds were diverted into an unknown private account
+corruption,The storekeeper sells new spare parts outside and reports them stolen
+corruption,Bills were split into smaller amounts to bypass approval limits
+corruption,The interview panel leaked the question paper to a favored candidate
+corruption,Scrap metal from the plant is sold secretly without any records
+technical,The checkout page crashes whenever a discount coupon is applied twice
+technical,The server runs out of disk space because logs are never rotated
+technical,The mobile app drains the entire battery within two hours of use
+technical,The login page throws an error on every third attempt consistently
+technical,The database replica lags behind primary by more than six hours
+technical,The payment gateway times out but still deducts money from customers
+technical,The website homepage takes over twenty seconds to load on mobile
+technical,The attendance system marks everyone absent when the server restarts
+technical,The API returns a server error for any request with special characters
+technical,The printer spooler service crashes the whole terminal every morning
+technical,The video calls freeze whenever more than five people join a meeting
+technical,The inventory count goes negative after bulk order cancellations
+technical,The password reset emails never arrive in user inboxes anymore
+technical,The GPS tracking shows delivery trucks parked in the ocean
+other,The canteen serves the same tasteless curry for lunch every day
+other,There is no clean drinking water available on the hostel floors
+other,The parking area floods completely during even light rainfall
+other,The office bus breaks down on the highway almost every week
+other,The washroom taps leak continuously and waste water all day
+other,The waiting hall fans make a loud grinding noise all afternoon
+other,The playground swings are broken and dangerous for small children
+other,The street lights outside the main gate never switch on at night
+other,The notice board announcements are months out of date and faded
+other,The community hall roof leaks directly onto the front row seats
+other,The garden sprinklers flood the walking path every single morning
+other,The elevator buttons are worn out and unreadable for visitors
+other,The clinic keeps running out of basic fever medicines weekly
+other,The footpath tiles are loose and cause people to trip daily

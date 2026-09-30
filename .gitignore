@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+*.db
+*.db-journal
+models/*.joblib
+test_model.joblib
+debug_model.joblib
+.pytest_cache/
+dist/
+build/
