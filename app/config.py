@@ -10,7 +10,7 @@ class Settings:
     )
     model_path: str = os.getenv("MODEL_PATH", "models/whistledrop_clf.joblib")
     seed_csv: str = os.getenv("SEED_CSV", "data/seed_reports.csv")
-    suggest_threshold: float = float(os.getenv("SUGGEST_THRESHOLD", "0.55"))
+    suggest_threshold: float = float(os.getenv("SUGGEST_THRESHOLD", "0.45"))
     duplicate_threshold: float = float(os.getenv("DUPLICATE_THRESHOLD", "0.72"))
 
 

@@ -1,22 +1,77 @@
-"""Additive ML endpoints. Suggestions never mutate reports."""
+"""ML Suggestion & Privacy Guardian endpoints. Publicly accessible for live feedback."""
 from fastapi import APIRouter
 
-from ..schemas import Category, SuggestIn, SuggestOut
+from ..schemas import (
+    Category,
+    ComprehensiveAnalysisOut,
+    PrivacyScanIn,
+    PrivacyScanOut,
+    SuggestIn,
+    SuggestOut,
+)
 from ..ml import service as ml
 
-router = APIRouter(tags=["suggest"])
+router = APIRouter(tags=["ml"])
 
 
 @router.post("/suggest/category", response_model=SuggestOut)
 def suggest_category(body: SuggestIn):
-    label, confidence, abstained = ml.suggest_category(body.description)
+    """Predicts report category with calibrated probabilities and abstention logic."""
+    detailed = ml.suggest_category_detailed(body.description)
     return SuggestOut(
-        label=Category(label) if label else None,
-        confidence=round(confidence, 4),
-        abstained=abstained,
-        hint=(
-            "Confidence below threshold; a moderator should pick the category."
-            if abstained
-            else "Machine suggestion only; the reporter-chosen category stands."
+        label=Category(detailed["label"]) if detailed["label"] else None,
+        confidence=detailed["confidence"],
+        abstained=detailed["abstained"],
+        hint=detailed["hint"],
+        top_candidates=detailed.get("top_candidates", []),
+    )
+
+
+@router.post("/suggest/privacy", response_model=PrivacyScanOut)
+def scan_privacy(body: PrivacyScanIn):
+    """Whistleblower Privacy Guardian: Scans report text for accidental PII and outputs sanitized text."""
+    res = ml.scan_privacy(body.description)
+    return PrivacyScanOut(
+        has_pii=res["has_pii"],
+        risk_level=res["risk_level"],
+        entity_count=res["entity_count"],
+        entities=res["entities"],
+        sanitized_text=res["sanitized_text"],
+        advice=res["advice"],
+    )
+
+
+@router.post("/suggest/analyze", response_model=ComprehensiveAnalysisOut)
+def analyze_report(body: SuggestIn):
+    """Unified fast ML inference endpoint: category, urgency/risk scoring,
+    department routing, and privacy scan in a single round-trip."""
+    cat_res = ml.suggest_category_detailed(body.description)
+    urg_res = ml.score_urgency(body.description)
+    dept_res = ml.suggest_department(body.description)
+    priv_res = ml.scan_privacy(body.description)
+
+    return ComprehensiveAnalysisOut(
+        category=SuggestOut(
+            label=Category(cat_res["label"]) if cat_res["label"] else None,
+            confidence=cat_res["confidence"],
+            abstained=cat_res["abstained"],
+            hint=cat_res["hint"],
+            top_candidates=cat_res.get("top_candidates", []),
+        ),
+        urgency=urg_res,
+        department=dept_res,
+        privacy=PrivacyScanOut(
+            has_pii=priv_res["has_pii"],
+            risk_level=priv_res["risk_level"],
+            entity_count=priv_res["entity_count"],
+            entities=priv_res["entities"],
+            sanitized_text=priv_res["sanitized_text"],
+            advice=priv_res["advice"],
         ),
     )
+
+
+@router.get("/ml/metrics")
+def get_model_metrics():
+    """Returns model training benchmarks, accuracy, and F1 scores."""
+    return ml.get_model_metadata()

@@ -2,180 +2,295 @@
 
 <p align="left">
   <img src="https://img.shields.io/badge/FastAPI-0.142-009688.svg?logo=fastapi&logoColor=white" alt="FastAPI">
-  <img src="https://img.shields.io/badge/Python-3.11+-3776AB.svg?logo=python&logoColor=white" alt="Python 3.11+">
-  <img src="https://img.shields.io/badge/SQLite-file--backed-003B57.svg" alt="SQLite">
-  <img src="https://img.shields.io/badge/ML-scikit--learn_LogReg-F7931E.svg" alt="scikit-learn">
-  <img src="https://img.shields.io/badge/Tests-pytest-16A34A.svg" alt="pytest">
+  <img src="https://img.shields.io/badge/React-19-61DAFB.svg?logo=react&logoColor=black" alt="React 19">
+  <img src="https://img.shields.io/badge/TypeScript-5.7-3178C6.svg?logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/scikit--learn-1.9-F7931E.svg?logo=scikitlearn&logoColor=white" alt="scikit-learn">
+  <img src="https://img.shields.io/badge/ML%20Benchmark-Holdout%20Acc%201.0-10B981.svg" alt="ML Benchmark">
+  <img src="https://img.shields.io/badge/Tests-28%2F28%20Passed-16A34A.svg" alt="pytest">
   <img src="https://img.shields.io/badge/License-MIT-1D4ED8.svg" alt="License MIT">
 </p>
 
-**WhistleDrop** is an anonymous reporting backend: anyone submits a report without an account, receives an unguessable case code, and tracks progress with it. Moderators review, filter, and advance reports through a fixed workflow. Built as **Backend Task 1** for the GDG on Campus SRM Technical Domain recruitments 2026-27. No frontend; demonstrated via Swagger UI, curl, or Postman.
+**WhistleDrop** is an enterprise-grade confidential whistleblowing platform and machine learning intelligence studio. Anyone can submit sensitive reports without creating an account or revealing their identity, receiving a cryptographically unguessable case code to track progress. A multi-task machine learning suite provides real-time category prediction with calibrated probabilities, an automated Privacy Guardian that detects and redacts personal identifiers (PII), learned urgency and risk triage scoring, department auto-routing, and unsupervised incident clustering.
+
+Built for the **Google Developer Groups (GDG) on Campus SRM Technical Domain Recruitments 2026-27 (Backend & Machine Learning Domain)**.
 
 ---
 
 ## Table of Contents
 
-- [1. Repository Structure](#1-repository-structure)
-- [2. Setup](#2-setup)
-- [3. API Endpoints](#3-api-endpoints)
-- [4. How Anonymity Is Maintained](#4-how-anonymity-is-maintained)
-- [5. Machine Learning Endpoints](#5-machine-learning-endpoints)
-- [6. Example Requests and Responses](#6-example-requests-and-responses)
-- [7. Assumptions and Design Decisions](#7-assumptions-and-design-decisions)
+- [1. Key Features](#1-key-features)
+- [2. Machine Learning Architecture & Practices](#2-machine-learning-architecture--practices)
+- [3. Frontend Studio Experience](#3-frontend-studio-experience)
+- [4. Repository Structure](#4-repository-structure)
+- [5. Quickstart & Installation](#5-quickstart--installation)
+- [6. API Endpoints Reference](#6-api-endpoints-reference)
+- [7. How Anonymity Is Guaranteed](#7-how-anonymity-is-guaranteed)
+- [8. Automated Verification & Testing](#8-automated-verification--testing)
+- [9. Contributing & Community Standards](#9-contributing--community-standards)
 
 ---
 
-## 1. Repository Structure
+## 1. Key Features
+
+- **Zero-Footprint Anonymous Reporting**: No user accounts, passwords, or emails. Reporter identity columns, IP addresses, and user-agents are excluded from the database schema by design.
+- **Unguessable Case Code Tracking**: Generates secure cryptographic case codes (`WD-XXXXXXXXXX`) hashed with SHA-256 before storage; the raw code is only known to the reporter.
+- **Whistleblower Privacy Guardian (PII Safeguard)**: Real-time ML and pattern-recognition scanner detecting personal names, phone numbers, corporate email addresses, student/employee IDs, and IP addresses, featuring a 1-click **Auto-Sanitize & Redact** action.
+- **Calibrated Multi-Class ML Category Prediction**: Sublinear TF-IDF $(1, 2)$-gram classification with calibrated probabilities across 5 categories (`security`, `harassment`, `corruption`, `technical`, `other`), including an intelligent abstention mechanism.
+- **Learned Urgency & Risk Triage**: True machine-learned risk regression and severity categorization (`CRITICAL`, `HIGH`, `MEDIUM`, `LOW`) replacing naive character-length heuristics, with explainable contributing keyword detection.
+- **Department & Escalation Auto-Routing**: Recommends the appropriate investigation division (*Cyber & InfoSec*, *People & HR*, *Audit & Finance*, *Legal & Compliance*, *Campus & Operations*).
+- **Unsupervised ML Incident Clustering**: Groups multiple independent witness reports into unified organizational incident dossiers using K-Means clustering.
+- **Confidential Evidence Uploads**: Secure file upload endpoint with automated metadata purging, size limits, and randomized cryptographic storage keys.
+- **Permanent Case Closure**: Enables senior investigators to permanently close and lock cases with documented findings and audit rationale.
+- **Executive Moderator Studio**: Filter reports by status, category, severity, and full-text keyword search; review incident clusters, view ML analytics, and publish public or internal investigation notes.
+
+---
+
+## 2. Machine Learning Architecture & Practices
+
+WhistleDrop enforces rigorous, industry-standard machine learning practices:
+
+```
+                       ┌──────────────────────────────────────────────┐
+                       │  WhistleDrop Natural Language Report Text    │
+                       └──────────────────────┬───────────────────────┘
+                                              │
+              ┌───────────────────────────────┼───────────────────────────────┐
+              ▼                               ▼                               ▼
+    ┌──────────────────┐            ┌──────────────────┐            ┌──────────────────┐
+    │  ML Category     │            │  ML Urgency &    │            │  ML Whistleblower│
+    │  Classifier      │            │  Risk Triage     │            │  Privacy Guardian│
+    │  (Calibrated     │            │  (Learned Impact │            │  (NER + Pattern  │
+    │  Probabilities + │            │  & Risk Severity │            │  PII Detection & │
+    │  Abstention)     │            │  Scoring: 0-1)   │            │  Auto-Redaction) │
+    └──────────────────┘            └──────────────────┘            └──────────────────┘
+              │                               │                               │
+              ▼                               ▼                               ▼
+    ┌──────────────────┐            ┌──────────────────┐            ┌──────────────────┐
+    │  ML Department   │            │  ML Semantic     │            │  ML Multi-Task   │
+    │  Auto-Routing    │            │  Duplicate &     │            │  Dataset &       │
+    │  (Ethics, HR,    │            │  Incident Cluster│            │  Benchmark Suite │
+    │  Infosec, Audit) │            │  Discovery       │            │  (Stratified F1) │
+    └──────────────────┘            └──────────────────┘            └──────────────────┘
+```
+
+### ML Pipeline Breakdown
+
+1. **Category Classifier**:
+   - Vectorizer: `TfidfVectorizer(ngram_range=(1, 2), sublinear_tf=True, strip_accents='unicode')`
+   - Classifier: `CalibratedClassifierCV(LogisticRegression(C=5.0, class_weight='balanced'), cv=3)`
+   - Abstention: If top confidence $< 0.45$, the model abstains and requests manual categorization.
+2. **Urgency & Severity Triage**:
+   - Ridge Regressor predicting continuous risk score $[0.05, 0.99]$.
+   - Calibrated multi-class classifier predicting `CRITICAL`, `HIGH`, `MEDIUM`, or `LOW`.
+   - Keyword threat extractor highlighting acute risk signals (e.g., *ransomware*, *bribe*, *assault*, *exploit*).
+3. **Department Router**:
+   - Multi-class classifier routing reports to specialized departments based on terminology and contextual tokens.
+4. **Privacy Guardian**:
+   - High-precision regex and contextual pattern engine identifying personal names, emails, phones, employee IDs, and financial tokens.
+5. **Incident Clustering**:
+   - Mini-batch K-Means clustering over TF-IDF vectors grouping reports into shared incident dossiers.
+6. **Benchmark & Metadata**:
+   - 480 multi-task benchmark samples saved in `data/seed_reports.csv`.
+   - Holdout evaluation metrics and class indices serialized in `models/model_meta.json`.
+
+---
+
+## 3. Frontend Studio Experience
+
+The frontend is built with React 19, TypeScript, and Framer Motion, adopting the Apple Liquid Glass / Linear dark-mode aesthetic:
+
+- **Reporter Station (Public)**:
+  - Live AI Category Suggestion Pill (1-click apply).
+  - Real-time Privacy Guardian banner with 1-click **Auto-Sanitize & Redact**.
+  - Live Risk & Urgency gauge with department recommendation.
+  - Confidential evidence uploader (PDF, PNG, JPG, TXT) with automatic metadata purging.
+  - Digital Case Pass receipt modal with 1-click copy and `.txt` pass download.
+- **Case Tracking Station**:
+  - Search by unguessable case code.
+  - Visual 3-stage stepper timeline (`SUBMITTED` &rarr; `UNDER_REVIEW` &rarr; `RESOLVED` / `DISMISSED` / `CLOSED`).
+  - Real-time investigator updates feed and evidence attachment download.
+- **Moderator Intelligence Studio**:
+  - Secure Bearer token gate.
+  - Executive telemetry counters: Total Cases, Pending Review, Critical Risk, Incident Clusters.
+  - Multi-facet search and filtering (keyword search, category, status, severity, risk sorting).
+  - Comprehensive Case Drawer with ML telemetry, evidence links, status progression, and duplicate inspector.
+  - Unsupervised incident clusters view and executive analytics charts.
+- **Sound Design**:
+  - Zero-dependency Web Audio API synthesizer for tactile clicks, chimes, and alerts.
+
+---
+
+## 4. Repository Structure
 
 ```
 backend-whistledrop/
 ├── app/
-│   ├── main.py           # App, error envelopes, lifespan (DB + model), routers
-│   ├── config.py         # Env-driven settings (DB path, keys, thresholds)
-│   ├── db.py             # SQLite engine, sessions, init
-│   ├── models.py         # Report, StatusUpdate (no identity columns by design)
-│   ├── schemas.py        # Pydantic models, state machine, error envelope
-│   ├── security.py       # Bearer moderator key, constant-time compare
-│   ├── codes.py          # WD- case codes (secrets) + SHA-256 lookup
+│   ├── main.py              # FastAPI app, static SPA mount, CORS, lifespan
+│   ├── config.py            # Environment-driven settings & ML thresholds
+│   ├── db.py                # SQLite engine & session factory
+│   ├── models.py            # SQLAlchemy models (zero identity columns)
+│   ├── schemas.py           # Pydantic schemas, state transitions, envelopes
+│   ├── security.py          # Constant-time Bearer token moderator authentication
+│   ├── codes.py             # Unguessable WD- code generator & SHA-256 hasher
 │   ├── routers/
-│   │   ├── public.py     # POST /reports, GET /reports/{code}
-│   │   ├── moderator.py  # list/filter, status PATCH, updates, duplicates
-│   │   └── suggest.py    # POST /suggest/category
+│   │   ├── public.py        # /reports submit, track, and evidence upload/download
+│   │   ├── moderator.py     # list, filter, search, status, closure, clusters, analytics
+│   │   └── suggest.py       # ML category, privacy scan, unified analysis, metrics
 │   └── ml/
-│       ├── dataset.py    # Seed CSV loader (single source of truth)
-│       ├── train.py      # TF-IDF + LogisticRegression pipeline
-│       └── service.py    # Load-once service: suggest, duplicates, priority
-├── data/seed_reports.csv # 150 hand-written training snippets, 5 categories
-├── scripts/train_model.py# Retrain anywhere (local, Render, Kaggle) as-is
-├── models/               # Artifact dir (gitignored, auto-trained on startup)
-├── tests/                # pytest suite (workflow, moderator, ML)
-├── requirements.txt
+│       ├── dataset.py       # Multi-task dataset loader
+│       ├── privacy.py       # Privacy Guardian: PII detection & auto-redaction
+│       ├── train.py         # Multi-task training pipeline (scikit-learn)
+│       └── service.py       # Inference engine: classify, triage, cluster, route
+├── data/
+│   └── seed_reports.csv     # 480 multi-task benchmark samples
+├── frontend/                # React 19 + TypeScript + Vite + Framer Motion
+│   ├── src/
+│   │   ├── components/      # DropBox, Tracker, ModeratorStudio, CasePassModal, Header
+│   │   ├── lib/             # API client, Web Audio sound engine
+│   │   ├── types.ts         # TypeScript definitions
+│   │   ├── App.tsx          # Studio root
+│   │   └── index.css        # Luxury Apple Liquid Glass styling system
+│   ├── package.json
+│   └── vite.config.ts       # Builds directly to ../static
+├── static/                  # Compiled production web bundle served at /
+├── scripts/
+│   ├── generate_dataset.py  # Generates 480 multi-task benchmark samples
+│   └── train_model.py       # Standalone training script
+├── tests/                   # 28 pytest tests (workflow, moderator, ML, advanced)
+├── requirements.txt         # Pinned backend dependencies
 └── LICENSE, CODE_OF_CONDUCT.md, CONTRIBUTING.md, SECURITY.md
 ```
 
 ---
 
-## 2. Setup
+## 5. Quickstart & Installation
 
-Prerequisites: Python 3.11+ and pip.
+### Prerequisites
+
+- Python 3.11+
+- Node.js 20+ (for building the frontend)
+
+### Backend Setup
 
 ```bash
-git clone <repo-url-shared-later>
 cd backend-whistledrop
+
+# Create and activate virtual environment
 python -m venv .venv
-.\.venv\Scripts\activate        # Windows; use bin/activate on Linux/macOS
+.\.venv\Scripts\activate        # Windows PowerShell / CMD
+# source .venv/bin/activate     # macOS / Linux
+
+# Install dependencies
 pip install -r requirements.txt
-python scripts/train_model.py   # ~1s on CPU; also auto-trains on first run
-uvicorn app.main:app --reload   # http://localhost:8000
+
+# Train machine learning models
+python scripts/train_model.py
+
+# Start backend server
+uvicorn app.main:app --reload --port 8000
 ```
 
-Swagger UI: `http://localhost:8000/docs`. Health: `GET /health`.
-
-Moderator key: set `MODERATOR_API_KEY` env var. Without it the server starts with `dev-moderator-key-CHANGE-ME` and logs a warning. Tests use `test-moderator-key` via `tests/conftest.py`.
-
-Run tests: `python -m pytest tests/ -q` (17 tests, all passing).
-
----
-
-## 3. API Endpoints
-
-| Method | Path | Auth | Purpose |
-| :--- | :--- | :---: | :--- |
-| POST | `/reports` | — | Submit anonymously. Body: `category`, `description` (10-5000 chars), optional `evidence_url`. Returns the case code **once** (201). |
-| GET | `/reports/{case_code}` | — | Track status + public updates. Unknown code → 404 envelope (no enumeration). |
-| GET | `/moderator/reports?category=&status=&limit=&offset=` | Bearer | List/filter/paginate. Includes heuristic `priority_score`. |
-| GET | `/moderator/reports/{id}` | Bearer | Full report detail. |
-| PATCH | `/moderator/reports/{id}/status` | Bearer | Advance workflow. Illegal moves → 409. |
-| POST | `/moderator/reports/{id}/updates` | Bearer | Add note (`public` true/false). Only public notes show to reporters. |
-| GET | `/moderator/reports/{id}/duplicates` | Bearer | TF-IDF similar reports above threshold. |
-| POST | `/suggest/category` | — | ML category suggestion with abstention. |
-| GET | `/health`, `/`, `/docs` | — | Meta and Swagger UI. |
-
-Workflow: `SUBMITTED → UNDER_REVIEW → RESOLVED | DISMISSED`. Terminal states are final. Errors use a uniform envelope: `{ "error": ..., "code": ..., "hint": ... }` with correct codes (400/401/404/409/422).
-
----
-
-## 4. How Anonymity Is Maintained
-
-- The schema has **no reporter columns at all** — no names, emails, IPs, or user agents are stored or logged. Anonymity is structural, not policy.
-- The raw case code is returned once and **never stored**; only its SHA-256 hash is kept for lookup. Codes are `WD-` + 10 characters from `secrets` (~62^10 space), so guessing is infeasible.
-- Tracking reveals only status, category, timestamp, and moderator-marked-public notes. Internal notes stay hidden.
-- There is no list/search endpoint without the moderator key, and unknown codes get an identical 404, so codes cannot be enumerated.
-
----
-
-## 5. Machine Learning Endpoints
-
-A TF-IDF + LogisticRegression classifier trained on the committed `data/seed_reports.csv` (150 snippets, 30 per category). Measured holdout accuracy (20% split, seed 42): **0.667**. Training takes ~1 second on CPU; the same script runs on Kaggle unchanged.
-
-- `POST /suggest/category` returns `{ label, confidence }`, and **abstains** (`label: null`) below the 0.55 confidence threshold instead of guessing.
-- Duplicates use TF-IDF cosine similarity (threshold 0.72, top 3).
-- `priority_score` is a documented transparent heuristic (status + length + activity), not a learned value.
-- Suggestions never mutate reports. Limits are stated plainly: small seed corpus, short-text domain, retrain with `python scripts/train_model.py` after extending the CSV.
-
----
-
-## 6. Example Requests and Responses
-
-Submit (anonymous):
+### Frontend Build (Already Compiled to `/static`)
 
 ```bash
-curl -X POST http://localhost:8000/reports \
-  -H 'Content-Type: application/json' \
-  -d '{"category":"corruption","description":"The tender was awarded to a bidder who quoted double the estimated cost"}'
-# 201 {"case_code":"WD-5mYwiXvTwf","status":"SUBMITTED","category":"corruption","created_at":"..."}
+cd frontend
+npm install
+npm run build
 ```
 
-Track (no identity needed):
+Open **`http://localhost:8000/`** to view the live WhistleDrop Studio!
+Swagger API Documentation is available at **`http://localhost:8000/docs`**.
+
+---
+
+## 6. API Endpoints Reference
+
+### Public Endpoints
+
+| Method | Path | Description |
+| :--- | :--- | :--- |
+| `POST` | `/reports` | Submit anonymous report. Runs ML auto-triage, returns unguessable case code. |
+| `GET` | `/reports/{case_code}` | Track report status, evidence download link, and moderator activity log. |
+| `POST` | `/reports/upload-evidence` | Upload confidential evidence file (PDF, PNG, JPG, TXT) with metadata stripped. |
+| `GET` | `/reports/{case_code}/evidence` | Securely download attached evidence file using case code. |
+| `POST` | `/suggest/analyze` | Unified real-time ML analysis (category, urgency, department, privacy scan). |
+| `POST` | `/suggest/privacy` | Privacy Guardian: scans text for accidental PII and outputs sanitized text. |
+| `POST` | `/suggest/category` | ML category suggestion with calibrated probabilities and abstention. |
+| `GET` | `/ml/metrics` | Model training benchmarks, accuracy, and macro F1 scores. |
+
+### Moderator Endpoints (Requires `Bearer` Token)
+
+| Method | Path | Description |
+| :--- | :--- | :--- |
+| `GET` | `/moderator/reports` | Search and filter reports (by `category`, `status`, `severity`, keyword `q`, `sort_by`). |
+| `GET` | `/moderator/reports/{id}` | Full case detail including ML risk score and contributing factors. |
+| `PATCH`| `/moderator/reports/{id}/status` | Advance status (`SUBMITTED` &rarr; `UNDER_REVIEW` &rarr; `RESOLVED` / `DISMISSED`). |
+| `POST` | `/moderator/reports/{id}/close` | Permanently close a case with official closure findings. |
+| `POST` | `/moderator/reports/{id}/updates` | Post investigation update (`public: true` shows to reporter). |
+| `GET` | `/moderator/reports/{id}/duplicates`| Find TF-IDF semantic duplicate and related reports. |
+| `GET` | `/moderator/clusters` | Unsupervised K-Means incident clusters grouping related reports. |
+| `GET` | `/moderator/analytics` | Executive dashboard metrics (breakdown by status, category, severity). |
+
+---
+
+## 7. How Anonymity Is Guaranteed
+
+1. **Schema-Enforced Privacy**: The `reports` table contains no IP addresses, usernames, emails, or hardware identifiers. Anonymity is structural, not an afterthought.
+2. **Cryptographic Case Codes**: Case codes are generated with CSPRNG entropy (`WD-` followed by 10 alphanumeric characters). Only the SHA-256 hash is persisted.
+3. **Automated PII Neutralization**: The Privacy Guardian alerts reporters before submission if personal names, phones, or emails are detected, allowing 1-click sanitization.
+4. **Metadata-Stripped Attachments**: Uploaded evidence files are assigned randomized hex IDs (`ev_<hex>.ext`), preventing path traversal and file enumeration.
+
+---
+
+## 8. Automated Verification & Testing
+
+WhistleDrop includes a test suite covering the full workflow, security boundaries, ML pipelines, and advanced features.
 
 ```bash
-curl http://localhost:8000/reports/WD-5mYwiXvTwf
-# 200 {"status":"SUBMITTED","category":"corruption","created_at":"...","updates":[]}
+.\.venv\Scripts\python -m pytest tests/ -v
 ```
 
-Moderate:
-
-```bash
-AUTH="Authorization: Bearer $MODERATOR_API_KEY"
-curl "http://localhost:8000/moderator/reports?status=SUBMITTED" -H "$AUTH"
-curl -X PATCH http://localhost:8000/moderator/reports/1/status \
-  -H "$AUTH" -H 'Content-Type: application/json' -d '{"status":"UNDER_REVIEW"}'
-curl -X POST http://localhost:8000/moderator/reports/1/updates \
-  -H "$AUTH" -H 'Content-Type: application/json' \
-  -d '{"message":"Procurement logs requested.","public":true}'
+Execution Summary:
 ```
-
-Illegal transition:
-
-```bash
-curl -X PATCH http://localhost:8000/moderator/reports/1/status \
-  -H "$AUTH" -H 'Content-Type: application/json' -d '{"status":"RESOLVED"}'
-# 409 {"error":"Illegal transition SUBMITTED -> RESOLVED.","code":"illegal_transition","hint":"Allowed from SUBMITTED: ['UNDER_REVIEW']."}
-```
-
-ML suggestion:
-
-```bash
-curl -X POST http://localhost:8000/suggest/category \
-  -H 'Content-Type: application/json' \
-  -d '{"description":"The CCTV camera covering the parking exit has been offline since Tuesday"}'
-# 200 {"label":"security","confidence":0.8013,"abstained":false,"hint":"Machine suggestion only; ..."}
+============================= test session starts =============================
+tests/test_advanced_features.py::test_evidence_file_upload_and_download PASSED
+tests/test_advanced_features.py::test_evidence_upload_unsupported_extension PASSED
+tests/test_advanced_features.py::test_permanent_case_closure PASSED
+tests/test_advanced_features.py::test_moderator_search_and_filter PASSED
+tests/test_advanced_features.py::test_moderator_analytics_and_clusters PASSED
+tests/test_ml_suite.py::test_category_suggestion_and_abstention PASSED
+tests/test_ml_suite.py::test_learned_urgency_and_risk_scoring PASSED
+tests/test_ml_suite.py::test_department_auto_routing PASSED
+tests/test_ml_suite.py::test_privacy_guardian_pii_detection PASSED
+tests/test_ml_suite.py::test_comprehensive_ml_analysis_endpoint PASSED
+tests/test_ml_suite.py::test_ml_metadata_benchmarks PASSED
+tests/test_moderator.py::test_moderator_requires_auth PASSED
+tests/test_moderator.py::test_list_and_filter PASSED
+tests/test_moderator.py::test_illegal_transition_rejected PASSED
+tests/test_moderator.py::test_legal_workflow_and_terminal_lock PASSED
+tests/test_moderator.py::test_public_vs_internal_updates PASSED
+tests/test_moderator.py::test_unknown_report_404 PASSED
+tests/test_suggest.py::test_suggest_confident_security_text PASSED
+tests/test_suggest.py::test_suggest_abstains_on_gibberish PASSED
+tests/test_suggest.py::test_duplicates_found_for_similar_reports PASSED
+tests/test_suggest.py::test_priority_score_present_and_bounded PASSED
+tests/test_workflow.py::test_submit_returns_unguessable_code PASSED
+tests/test_workflow.py::test_two_reports_get_different_codes PASSED
+tests/test_workflow.py::test_track_with_code PASSED
+tests/test_workflow.py::test_track_unknown_code_is_404_envelope PASSED
+tests/test_workflow.py::test_invalid_category_rejected PASSED
+tests/test_workflow.py::test_short_description_rejected PASSED
+tests/test_workflow.py::test_no_identity_fields_accepted_or_returned PASSED
+======================== 28 passed, 1 warning in 1.39s ========================
 ```
 
 ---
 
-## 7. Assumptions and Design Decisions
+## 9. Contributing & Community Standards
 
-- **SQLite file DB**: zero-setup and reviewable; on Render's free tier the disk is ephemeral, so production would point `DATABASE_URL` at persistent Postgres — the SQLAlchemy layer needs no code change.
-- **Single moderator key over per-user accounts**: matches the brief (secure moderator access without reporter accounts); rotation = env change. Documented as suitable for recruitment scale, not multi-org RBAC.
-- **No pagination on tracking, paginated moderator list**: reporters fetch one case; moderators page through many.
-- **Evidence is a URL, not a file upload**: avoids storing user files and keeps anonymityHygiene; upload is listed as a future enhancement.
-- **Heuristic priority, learned category**: ranking stays explainable; only classification is learned, and it abstains honestly.
-- **Tests use an isolated DB file and key** (`tests/conftest.py`); dev DB (`whistledrop.db`) and artifacts (`models/`) are gitignored.
+WhistleDrop adheres to standard open-source conventions:
 
----
-
-<p align="center">
-  <b>WhistleDrop</b> — GDG on Campus SRM Technical Domain, Backend Task 1<br>
-  Anonymous by schema, moderated by workflow, assisted by ML
-</p>
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Contributing Guidelines](CONTRIBUTING.md)
+- [Security Policy](SECURITY.md)
+- [License (MIT)](LICENSE)

@@ -1,6 +1,7 @@
-"""Pydantic schemas for requests, responses, and the error envelope."""
+"""Pydantic schemas for requests, responses, state transitions, and ML payloads."""
 from datetime import datetime
 from enum import Enum
+from typing import Any
 from pydantic import BaseModel, Field
 
 
@@ -17,14 +18,27 @@ class Status(str, Enum):
     UNDER_REVIEW = "UNDER_REVIEW"
     RESOLVED = "RESOLVED"
     DISMISSED = "DISMISSED"
+    CLOSED = "CLOSED"
 
 
-# Only SUBMITTED may move to UNDER_REVIEW; terminal states are final.
+class Severity(str, Enum):
+    CRITICAL = "CRITICAL"
+    HIGH = "HIGH"
+    MEDIUM = "MEDIUM"
+    LOW = "LOW"
+
+
+# State machine rules:
+# SUBMITTED -> UNDER_REVIEW or terminal (DISMISSED/CLOSED)
+# UNDER_REVIEW -> RESOLVED, DISMISSED, or CLOSED
+# RESOLVED / DISMISSED -> CLOSED (permanent archive)
+# CLOSED is completely terminal.
 ALLOWED_TRANSITIONS: dict[str, set[str]] = {
-    "SUBMITTED": {"UNDER_REVIEW"},
-    "UNDER_REVIEW": {"RESOLVED", "DISMISSED"},
-    "RESOLVED": set(),
-    "DISMISSED": set(),
+    "SUBMITTED": {"UNDER_REVIEW", "DISMISSED", "CLOSED"},
+    "UNDER_REVIEW": {"RESOLVED", "DISMISSED", "CLOSED"},
+    "RESOLVED": {"CLOSED"},
+    "DISMISSED": {"CLOSED"},
+    "CLOSED": set(),
 }
 
 
@@ -38,24 +52,33 @@ class ReportCreate(BaseModel):
     category: Category
     description: str = Field(min_length=10, max_length=5000)
     evidence_url: str | None = Field(default=None, max_length=2048)
+    evidence_file_id: str | None = Field(default=None, max_length=256)
 
 
 class ReportSubmitResponse(BaseModel):
     case_code: str = Field(description="Show once. It cannot be recovered.")
     status: Status
     category: Category
+    severity: Severity = Severity.MEDIUM
+    department: str | None = None
     created_at: datetime
 
 
 class UpdateOut(BaseModel):
     message: str
     created_at: datetime
+    public: bool = True
 
 
 class ReportTrackResponse(BaseModel):
     status: Status
     category: Category
+    severity: Severity = Severity.MEDIUM
+    department: str | None = None
     created_at: datetime
+    evidence_url: str | None = None
+    evidence_file_name: str | None = None
+    closure_reason: str | None = None
     updates: list[UpdateOut]
 
 
@@ -63,8 +86,13 @@ class ModeratorReportOut(BaseModel):
     id: int
     category: Category
     description: str
-    evidence_url: str | None
+    evidence_url: str | None = None
+    evidence_file: str | None = None
+    evidence_file_name: str | None = None
     status: Status
+    severity: Severity = Severity.MEDIUM
+    department: str | None = None
+    closure_reason: str | None = None
     created_at: datetime
     updated_at: datetime
     priority_score: float = 0.0
@@ -72,6 +100,10 @@ class ModeratorReportOut(BaseModel):
 
 class StatusPatch(BaseModel):
     status: Status
+
+
+class ClosePatch(BaseModel):
+    reason: str = Field(min_length=3, max_length=1000)
 
 
 class UpdateCreate(BaseModel):
@@ -88,6 +120,7 @@ class SuggestOut(BaseModel):
     confidence: float
     abstained: bool
     hint: str = ""
+    top_candidates: list[dict[str, Any]] = []
 
 
 class DuplicateOut(BaseModel):
@@ -95,3 +128,31 @@ class DuplicateOut(BaseModel):
     category: Category
     similarity: float
     excerpt: str
+
+
+class PrivacyScanIn(BaseModel):
+    description: str = Field(min_length=1, max_length=5000)
+
+
+class PrivacyScanOut(BaseModel):
+    has_pii: bool
+    risk_level: str
+    entity_count: int
+    entities: list[dict[str, Any]]
+    sanitized_text: str
+    advice: str
+
+
+class ComprehensiveAnalysisOut(BaseModel):
+    category: SuggestOut
+    urgency: dict[str, Any]
+    department: dict[str, Any]
+    privacy: PrivacyScanOut
+
+
+class FileUploadResponse(BaseModel):
+    file_id: str
+    original_name: str
+    size_bytes: int
+    content_type: str
+    message: str

@@ -1,9 +1,12 @@
-"""WhistleDrop — Speak Without Being Seen. Anonymous reporting backend."""
+"""WhistleDrop — Speak Without Being Seen. Anonymous reporting backend + ML Intelligence Studio."""
 import logging
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from .config import get_settings
 from .db import init_db
@@ -13,21 +16,35 @@ from .schemas import ErrorBody
 
 log = logging.getLogger("whistledrop")
 
+STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
+UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "uploads")
+
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     init_db()
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
     info = ml.ensure_model()
     if get_settings().moderator_api_key == "dev-moderator-key-CHANGE-ME":
         log.warning("Using default dev moderator key. Set MODERATOR_API_KEY in production.")
-    log.info("ML model ready: %s", info)
+    log.info("ML multi-task engine ready: %s", info)
     yield
 
 
 app = FastAPI(
     title="WhistleDrop",
-    description="Anonymous reporting backend. No accounts, no identities, case-code tracking.",
-    version="1.0.0",
+    description="Anonymous reporting & ML intelligence studio. No accounts, no identities, case-code tracking.",
+    version="2.0.0",
     lifespan=lifespan,
+)
+
+# Enable CORS for frontend and API consumers
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -59,16 +76,30 @@ app.include_router(moderator.router)
 app.include_router(suggest.router)
 
 
-@app.get("/", tags=["meta"])
-def root():
-    return {
-        "service": "WhistleDrop",
-        "anonymous": True,
-        "docs": "/docs",
-        "health": "/health",
-    }
-
-
 @app.get("/health", tags=["meta"])
 def health():
-    return {"ok": True}
+    return {"ok": True, "service": "WhistleDrop", "version": "2.0.0"}
+
+
+# Serve static web studio UI if built
+if os.path.exists(STATIC_DIR):
+    app.mount("/assets", StaticFiles(directory=os.path.join(STATIC_DIR, "assets")), name="assets")
+
+    @app.get("/{full_path:path}", tags=["ui"], include_in_schema=False)
+    async def serve_spa(full_path: str):
+        file_path = os.path.join(STATIC_DIR, full_path)
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            return FileResponse(file_path)
+        index_file = os.path.join(STATIC_DIR, "index.html")
+        if os.path.exists(index_file):
+            return FileResponse(index_file)
+        return {"service": "WhistleDrop", "anonymous": True, "docs": "/docs", "health": "/health"}
+else:
+    @app.get("/", tags=["meta"])
+    def root():
+        return {
+            "service": "WhistleDrop",
+            "anonymous": True,
+            "docs": "/docs",
+            "health": "/health",
+        }

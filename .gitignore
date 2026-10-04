@@ -11,3 +11,6 @@ debug_model.joblib
 .pytest_cache/
 dist/
 build/
+frontend/node_modules/
+uploads/
+test_whistledrop.db

@@ -1,0 +1,41 @@
+{
+  "version": "2.0.0",
+  "trained_at": "2026-10-04T08:26:54.911801+00:00",
+  "n_samples": 480,
+  "metrics": {
+    "category": {
+      "accuracy": 1.0,
+      "macro_f1": 1.0
+    },
+    "urgency": {
+      "accuracy": 1.0,
+      "macro_f1": 1.0
+    },
+    "department": {
+      "accuracy": 1.0,
+      "macro_f1": 1.0
+    }
+  },
+  "classes": {
+    "categories": [
+      "corruption",
+      "harassment",
+      "other",
+      "security",
+      "technical"
+    ],
+    "urgencies": [
+      "CRITICAL",
+      "HIGH",
+      "LOW",
+      "MEDIUM"
+    ],
+    "departments": [
+      "Audit & Finance",
+      "Campus & Operations",
+      "Cyber & InfoSec",
+      "Legal & Compliance",
+      "People & HR"
+    ]
+  }
+}

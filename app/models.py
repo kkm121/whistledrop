@@ -20,7 +20,13 @@ class Report(Base):
     category: Mapped[str] = mapped_column(String(32), index=True)
     description: Mapped[str] = mapped_column(Text)
     evidence_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
+    evidence_file: Mapped[str | None] = mapped_column(String(256), nullable=True)
+    evidence_file_name: Mapped[str | None] = mapped_column(String(256), nullable=True)
     status: Mapped[str] = mapped_column(String(16), default="SUBMITTED", index=True)
+    severity: Mapped[str] = mapped_column(String(16), default="MEDIUM", index=True)
+    department: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    closure_reason: Mapped[str | None] = mapped_column(String(1000), nullable=True)
+
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=_utcnow, onupdate=_utcnow
