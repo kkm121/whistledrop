@@ -249,3 +249,20 @@ def get_model_metadata() -> dict[str, Any]:
         "status": "active",
         "categories": _bundle["labels"] if _bundle else [],
     }
+
+
+_active_learning_buffer: list[dict[str, Any]] = []
+
+
+def record_active_learning_sample(
+    description: str, category: str, severity: str, feedback_notes: str = ""
+) -> dict[str, Any]:
+    """Records human-in-the-loop moderator corrections to calibrate inference pipelines."""
+    sample = {
+        "text": description,
+        "category": category,
+        "severity": severity,
+        "notes": feedback_notes,
+    }
+    _active_learning_buffer.append(sample)
+    return {"buffer_size": len(_active_learning_buffer), "sample": sample}

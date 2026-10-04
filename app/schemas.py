@@ -202,3 +202,17 @@ class ZKProofVerifyOut(BaseModel):
     guarantee: str | None = None
     error: str | None = None
 
+
+class MLFeedbackCreate(BaseModel):
+    corrected_category: Category | None = None
+    corrected_severity: Severity | None = None
+    feedback_notes: str = Field(default="", max_length=1000)
+
+
+class MLFeedbackResponse(BaseModel):
+    status: str
+    report_id: int
+    category: Category
+    severity: Severity
+    message: str
+

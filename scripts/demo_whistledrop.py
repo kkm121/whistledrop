@@ -170,6 +170,19 @@ def run_demonstration():
     assert res_final.status_code == 200
     print(f"{GREEN}[OK] Transitioned Status to RESOLVED (Case resolved successfully).{RESET}")
 
+    # Active Learning: Moderator ML Feedback
+    fb_res = client.post(
+        f"/moderator/reports/{report_id}/ml-feedback",
+        headers=AUTH_HEADER,
+        json={
+            "corrected_category": "security",
+            "corrected_severity": "CRITICAL",
+            "feedback_notes": "Credential exfiltration confirmed; model calibration sample logged.",
+        },
+    )
+    assert fb_res.status_code == 200
+    print(f"{GREEN}[OK] Human-in-the-loop Active Learning feedback recorded for continuous ML model calibration.{RESET}")
+
     # ---------------------------------------------------------
     # TASK 5: Research State-of-the-Art Innovations
     # ---------------------------------------------------------

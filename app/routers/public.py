@@ -21,6 +21,7 @@ from ..schemas import (
 )
 from ..ml import service as ml
 from ..ml.honey import HoneyVault
+from ..security import check_anonymous_rate_limit
 
 router = APIRouter(tags=["public"])
 
@@ -28,6 +29,26 @@ router = APIRouter(tags=["public"])
 UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "uploads")
 ALLOWED_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg", ".txt", ".docx", ".csv"}
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
+
+
+def _validate_magic_bytes(ext: str, contents: bytes) -> bool:
+    if not contents:
+        return False
+    if ext == ".pdf":
+        return contents.startswith(b"%PDF")
+    if ext == ".png":
+        return contents.startswith(b"\x89PNG\r\n\x1a\n")
+    if ext in (".jpg", ".jpeg"):
+        return contents.startswith(b"\xff\xd8\xff")
+    if ext == ".docx":
+        return contents.startswith(b"PK\x03\x04")
+    if ext in (".txt", ".csv"):
+        try:
+            sample = contents[:4096].decode("utf-8")
+            return "\x00" not in sample
+        except UnicodeDecodeError:
+            return False
+    return False
 
 
 def _unknown_code() -> HTTPException:
@@ -72,6 +93,16 @@ async def upload_evidence(file: UploadFile = File(...)):
             ).model_dump(),
         )
 
+    if not _validate_magic_bytes(ext, contents):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=ErrorBody(
+                error=f"File content signature does not match declared extension '{ext}'.",
+                code="spoofed_file_extension",
+                hint="Please upload genuine document or image files.",
+            ).model_dump(),
+        )
+
     os.makedirs(UPLOAD_DIR, exist_ok=True)
     file_id = f"ev_{secrets.token_hex(16)}{ext}"
     dest_path = os.path.join(UPLOAD_DIR, file_id)
@@ -88,7 +119,12 @@ async def upload_evidence(file: UploadFile = File(...)):
     )
 
 
-@router.post("/reports", response_model=ReportSubmitResponse, status_code=201)
+@router.post(
+    "/reports",
+    response_model=ReportSubmitResponse,
+    status_code=201,
+    dependencies=[Depends(check_anonymous_rate_limit)],
+)
 def submit_report(body: ReportCreate, db: Session = Depends(get_db)):
     for _ in range(5):  # retry on the astronomically unlikely hash collision
         code = generate_case_code()

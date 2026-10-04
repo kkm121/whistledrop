@@ -320,7 +320,11 @@ tests/test_workflow.py::test_track_unknown_code_is_404_envelope PASSED
 tests/test_workflow.py::test_invalid_category_rejected PASSED
 tests/test_workflow.py::test_short_description_rejected PASSED
 tests/test_workflow.py::test_no_identity_fields_accepted_or_returned PASSED
-======================== 35 passed, 1 warning in 1.51s ========================
+tests/test_security_hardening.py::test_evidence_upload_valid_magic_bytes PASSED
+tests/test_security_hardening.py::test_evidence_upload_spoofed_extension_rejected PASSED
+tests/test_security_hardening.py::test_anonymous_rate_limiter_allows_normal_burst_and_protects_backend PASSED
+tests/test_security_hardening.py::test_moderator_active_learning_feedback PASSED
+======================== 39 passed, 1 warning in 2.53s ========================
 ```
 
 ---

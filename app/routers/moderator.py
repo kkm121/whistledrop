@@ -12,6 +12,8 @@ from ..schemas import (
     ClosePatch,
     DuplicateOut,
     ErrorBody,
+    MLFeedbackCreate,
+    MLFeedbackResponse,
     ModeratorReportOut,
     Severity,
     Status,
@@ -308,4 +310,32 @@ def seed_demo_reports(db: Session = Depends(get_db)):
         seeded_ids.append(rep.id)
 
     return {"ok": True, "seeded_count": len(seeded_ids), "report_ids": seeded_ids}
+
+
+@router.post("/reports/{report_id}/ml-feedback", response_model=MLFeedbackResponse)
+def submit_ml_feedback(report_id: int, body: MLFeedbackCreate, db: Session = Depends(get_db)):
+    """Human-in-the-loop active learning feedback: corrects category and/or severity,
+    logging calibration samples for continuous ML model refinement."""
+    r = _get_or_404(db, report_id)
+    if body.corrected_category:
+        r.category = body.corrected_category.value
+    if body.corrected_severity:
+        r.severity = body.corrected_severity.value
+    db.commit()
+    db.refresh(r)
+
+    ml.record_active_learning_sample(
+        description=r.description,
+        category=r.category,
+        severity=r.severity,
+        feedback_notes=body.feedback_notes,
+    )
+
+    return MLFeedbackResponse(
+        status="feedback_recorded",
+        report_id=r.id,
+        category=Category(r.category),
+        severity=Severity(r.severity),
+        message="Active learning sample successfully recorded. Model calibration updated.",
+    )
 
