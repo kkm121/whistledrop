@@ -63,10 +63,10 @@ export const LiquidBackdrop: React.FC = () => {
     const renderLoop = () => {
       if (!isVisible) return;
       animId = requestAnimationFrame(renderLoop);
-      time += 0.009;
+      time += 0.02;
 
-      mouseX += (targetMouseX - mouseX) * 0.04;
-      mouseY += (targetMouseY - mouseY) * 0.04;
+      mouseX += (targetMouseX - mouseX) * 0.08;
+      mouseY += (targetMouseY - mouseY) * 0.08;
 
       ctx.clearRect(0, 0, width, height);
 
@@ -74,20 +74,35 @@ export const LiquidBackdrop: React.FC = () => {
       ctx.globalCompositeOperation = isDark ? 'screen' : 'multiply';
 
       orbs.forEach((orb, i) => {
-        const ox = orb.x + Math.sin(time + i * 1.4) * 120 + (mouseX - width / 2) * (0.09 * (i + 1));
-        const oy = orb.y + Math.cos(time + i * 1.7) * 95 + (mouseY - height / 2) * (0.09 * (i + 1));
+        // Continuous autonomous drift with border bounce
+        orb.x += orb.vx * 1.2;
+        orb.y += orb.vy * 1.2;
+        if (orb.x < width * 0.05 || orb.x > width * 0.95) orb.vx *= -1;
+        if (orb.y < height * 0.05 || orb.y > height * 0.95) orb.vy *= -1;
 
-        const grad = ctx.createRadialGradient(ox, oy, 10, ox, oy, orb.radius);
+        // Multi-frequency harmonic wave displacement + mouse responsive inertia
+        const waveX = Math.sin(time * 1.3 + i * 1.6) * 160 + Math.cos(time * 0.8 + i) * 60;
+        const waveY = Math.cos(time * 1.5 + i * 1.9) * 130 + Math.sin(time * 0.7 + i) * 50;
+        const pushX = (mouseX - width / 2) * (0.14 * (i + 1));
+        const pushY = (mouseY - height / 2) * (0.14 * (i + 1));
+
+        const ox = orb.x + waveX + pushX;
+        const oy = orb.y + waveY + pushY;
+
+        // Dynamic pulsing radius
+        const currentRadius = orb.radius + Math.sin(time * 2 + i) * 35;
+
+        const grad = ctx.createRadialGradient(ox, oy, 15, ox, oy, Math.max(currentRadius, 80));
         const col = isDark ? orb.colorDark : orb.colorLight;
 
-        grad.addColorStop(0, isDark ? `${col}cc` : `${col}77`);
-        grad.addColorStop(0.28, isDark ? `${col}77` : `${col}44`);
-        grad.addColorStop(0.65, isDark ? `${col}22` : `${col}12`);
+        grad.addColorStop(0, isDark ? `${col}ee` : `${col}aa`);
+        grad.addColorStop(0.35, isDark ? `${col}99` : `${col}66`);
+        grad.addColorStop(0.72, isDark ? `${col}44` : `${col}20`);
         grad.addColorStop(1, 'transparent');
 
         ctx.fillStyle = grad;
         ctx.beginPath();
-        ctx.arc(ox, oy, orb.radius, 0, Math.PI * 2);
+        ctx.arc(ox, oy, Math.max(currentRadius, 80), 0, Math.PI * 2);
         ctx.fill();
       });
 

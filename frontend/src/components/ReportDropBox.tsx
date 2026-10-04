@@ -48,6 +48,17 @@ export const ReportDropBox: React.FC<Props> = ({ onSuccess, flashNotice }) => {
   const [uploadingFile, setUploadingFile] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [flipLevitating, setFlipLevitating] = useState(false);
+
+  const triggerFlip = (targetFlipped: boolean) => {
+    sounds.playJump();
+    setFlipLevitating(true);
+    setIsFlipped(targetFlipped);
+    setTimeout(() => {
+      sounds.playLand();
+      setFlipLevitating(false);
+    }, 950);
+  };
 
   // ML Analysis State
   const [mlData, setMlData] = useState<MLComprehensiveAnalysis | null>(null);
@@ -205,7 +216,19 @@ export const ReportDropBox: React.FC<Props> = ({ onSuccess, flashNotice }) => {
 
       {/* 3D Flip Card Stage */}
       <div className="perspective-flip-stage">
-        <div className={`flip-card-3d ${isFlipped ? 'is-flipped' : ''}`}>
+        <motion.div
+          className={`flip-card-3d ${isFlipped ? 'is-flipped' : ''}`}
+          animate={{
+            rotateY: isFlipped ? 180 : 0,
+            y: flipLevitating ? [0, -90, -90, 0] : 0,
+            scale: flipLevitating ? [1, 1.06, 1.06, 1] : 1,
+          }}
+          transition={{
+            duration: 0.95,
+            times: [0, 0.44, 0.72, 1.0],
+            ease: [0.16, 1, 0.3, 1],
+          }}
+        >
           
           {/* FRONT FACE: Report Submission Form */}
           <div className="flip-card-face flip-card-front">
@@ -222,10 +245,7 @@ export const ReportDropBox: React.FC<Props> = ({ onSuccess, flashNotice }) => {
                 <button
                   type="button"
                   className="card-flip-btn"
-                  onClick={() => {
-                    sounds.playTap();
-                    setIsFlipped(true);
-                  }}
+                  onClick={() => triggerFlip(true)}
                   title="3D Flip to inspect real-time ML triage diagnostics"
                 >
                   <RotateCwIcon size={14} />
@@ -532,10 +552,7 @@ export const ReportDropBox: React.FC<Props> = ({ onSuccess, flashNotice }) => {
                 <button
                   type="button"
                   className="card-flip-btn return-btn"
-                  onClick={() => {
-                    sounds.playTap();
-                    setIsFlipped(false);
-                  }}
+                  onClick={() => triggerFlip(false)}
                   title="Return to report submission form"
                 >
                   <RotateCwIcon size={14} />
@@ -659,10 +676,7 @@ export const ReportDropBox: React.FC<Props> = ({ onSuccess, flashNotice }) => {
                 <button
                   type="button"
                   className="btn-primary"
-                  onClick={() => {
-                    sounds.playTap();
-                    setIsFlipped(false);
-                  }}
+                  onClick={() => triggerFlip(false)}
                 >
                   Return to Submission Form →
                 </button>
@@ -670,7 +684,7 @@ export const ReportDropBox: React.FC<Props> = ({ onSuccess, flashNotice }) => {
             </div>
           </div>
 
-        </div>
+        </motion.div>
       </div>
     </div>
   );

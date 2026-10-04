@@ -94,10 +94,10 @@ body {
   height: 100vh;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.92;
-  filter: blur(55px);
+  opacity: 0.95;
   transform: translateZ(0);
 }
+
 
 .liquid-noise-overlay {
   position: fixed;
@@ -366,6 +366,126 @@ body {
 /* ==========================================================================
    App Shell Layout & Translucency
    ========================================================================== */
+/* ==========================================================================
+   GTA V & Keynote 3D Title Slide Presentation
+   ========================================================================== */
+.gta-presentation-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, rgba(3, 3, 5, 0.9) 0%, rgba(3, 3, 5, 0.98) 100%);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  pointer-events: none;
+  padding: 24px;
+  perspective: 1400px;
+}
+
+.gta-title-card {
+  text-align: center;
+  padding: 50px 70px;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(48px) saturate(210%);
+  -webkit-backdrop-filter: blur(48px) saturate(210%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 36px;
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.85), 0 0 80px rgba(99, 102, 241, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  position: relative;
+  overflow: hidden;
+  max-width: min(920px, 94vw);
+  transform-style: preserve-3d;
+}
+
+.gta-presenter-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 20px;
+  border-radius: 999px;
+  background: rgba(99, 102, 241, 0.14);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.25em;
+  color: #38bdf8;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+
+.gta-headline {
+  font-family: var(--font-sans);
+  font-size: clamp(48px, 9vw, 104px);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin: 0 0 12px;
+  text-transform: uppercase;
+  background: linear-gradient(180deg, #ffffff 30%, #cbd5e1 75%, #64748b 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+.gta-accent {
+  background: linear-gradient(135deg, #38bdf8 0%, #6366f1 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.gta-subline {
+  font-family: var(--font-sans);
+  font-size: clamp(16px, 2.8vw, 26px);
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #38bdf8;
+  margin: 0 0 24px;
+  text-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+}
+
+.gta-meta-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  color: #94a3b8;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 16px;
+}
+
+.gta-dot {
+  color: rgba(56, 189, 248, 0.6);
+}
+
+.gta-specular-flash {
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 80%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transform: skewX(-25deg);
+  pointer-events: none;
+  animation: gtaFlashSweep 2s ease-in-out infinite;
+}
+
+@keyframes gtaFlashSweep {
+  0% { left: -120%; }
+  60% { left: 180%; }
+  100% { left: 180%; }
+}
+
 .whistle-studio-app {
   position: relative;
   z-index: 2;
