@@ -14,3 +14,4 @@ build/
 frontend/node_modules/
 uploads/
 test_whistledrop.db
+model_meta.json
