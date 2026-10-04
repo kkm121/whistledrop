@@ -1,65 +1,115 @@
 import React, { useEffect, useRef } from 'react';
 
+/**
+ * Liquid Glass Aurora Canvas.
+ * Creates an organic, undulating liquid mesh with vibrant violet/cyan/electric blue color blending
+ * and mouse-reactive fluid inertia.
+ */
 export const LiquidBackdrop: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let animId: number;
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
+    let width = (canvas.width = Math.floor(window.innerWidth / 2));
+    let height = (canvas.height = Math.floor(window.innerHeight / 2));
 
-    const onResize = () => {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
+    let mouseX = width / 2;
+    let mouseY = height / 2;
+    let targetMouseX = mouseX;
+    let targetMouseY = mouseY;
+
+    const handlePointerMove = (e: PointerEvent) => {
+      targetMouseX = e.clientX / 2;
+      targetMouseY = e.clientY / 2;
     };
-    window.addEventListener('resize', onResize);
+    window.addEventListener('pointermove', handlePointerMove);
 
+    const handleResize = () => {
+      if (!canvas) return;
+      width = canvas.width = Math.floor(window.innerWidth / 2);
+      height = canvas.height = Math.floor(window.innerHeight / 2);
+    };
+    window.addEventListener('resize', handleResize);
+
+    // Multi-color vibrant orbs
     const orbs = [
-      { x: width * 0.2, y: height * 0.3, r: 280, dx: 0.3, dy: 0.25, color: 'rgba(99, 102, 241, 0.12)' },
-      { x: width * 0.8, y: height * 0.4, r: 340, dx: -0.25, dy: 0.3, color: 'rgba(168, 85, 247, 0.10)' },
-      { x: width * 0.5, y: height * 0.8, r: 300, dx: 0.2, dy: -0.2, color: 'rgba(14, 165, 233, 0.09)' },
+      { x: width * 0.22, y: height * 0.26, radius: 260, vx: 0.6, vy: 0.4, colorDark: '#6366f1', colorLight: '#818cf8' },
+      { x: width * 0.82, y: height * 0.32, radius: 280, vx: -0.5, vy: 0.7, colorDark: '#06b6d4', colorLight: '#38bdf8' },
+      { x: width * 0.52, y: height * 0.75, radius: 300, vx: 0.7, vy: -0.5, colorDark: '#3b82f6', colorLight: '#60a5fa' },
+      { x: width * 0.88, y: height * 0.82, radius: 240, vx: -0.4, vy: -0.6, colorDark: '#ec4899', colorLight: '#f472b6' },
+      { x: width * 0.16, y: height * 0.84, radius: 250, vx: 0.5, vy: 0.5, colorDark: '#8b5cf6', colorLight: '#a78bfa' },
     ];
 
-    const render = () => {
+    let animId = 0;
+    let isVisible = true;
+    const handleVis = () => {
+      isVisible = !document.hidden;
+      if (isVisible) renderLoop();
+    };
+    document.addEventListener('visibilitychange', handleVis);
+
+    let isDark = document.documentElement.dataset.theme !== 'light';
+    const themeObserver = new MutationObserver(() => {
+      isDark = document.documentElement.dataset.theme !== 'light';
+    });
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+    let time = 0;
+    const renderLoop = () => {
+      if (!isVisible) return;
+      animId = requestAnimationFrame(renderLoop);
+      time += 0.009;
+
+      mouseX += (targetMouseX - mouseX) * 0.04;
+      mouseY += (targetMouseY - mouseY) * 0.04;
+
       ctx.clearRect(0, 0, width, height);
 
-      orbs.forEach((orb) => {
-        orb.x += orb.dx;
-        orb.y += orb.dy;
-        if (orb.x - orb.r < 0 || orb.x + orb.r > width) orb.dx *= -1;
-        if (orb.y - orb.r < 0 || orb.y + orb.r > height) orb.dy *= -1;
+      ctx.save();
+      ctx.globalCompositeOperation = isDark ? 'screen' : 'multiply';
 
-        const grad = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, orb.r);
-        grad.addColorStop(0, orb.color);
-        grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      orbs.forEach((orb, i) => {
+        const ox = orb.x + Math.sin(time + i * 1.4) * 120 + (mouseX - width / 2) * (0.09 * (i + 1));
+        const oy = orb.y + Math.cos(time + i * 1.7) * 95 + (mouseY - height / 2) * (0.09 * (i + 1));
+
+        const grad = ctx.createRadialGradient(ox, oy, 10, ox, oy, orb.radius);
+        const col = isDark ? orb.colorDark : orb.colorLight;
+
+        grad.addColorStop(0, isDark ? `${col}cc` : `${col}77`);
+        grad.addColorStop(0.28, isDark ? `${col}77` : `${col}44`);
+        grad.addColorStop(0.65, isDark ? `${col}22` : `${col}12`);
+        grad.addColorStop(1, 'transparent');
 
         ctx.fillStyle = grad;
         ctx.beginPath();
-        ctx.arc(orb.x, orb.y, orb.r, 0, Math.PI * 2);
+        ctx.arc(ox, oy, orb.radius, 0, Math.PI * 2);
         ctx.fill();
       });
 
-      animId = requestAnimationFrame(render);
+      ctx.restore();
     };
 
-    render();
+    renderLoop();
 
     return () => {
-      window.removeEventListener('resize', onResize);
+      isVisible = false;
+      themeObserver.disconnect();
       cancelAnimationFrame(animId);
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('resize', handleResize);
+      document.removeEventListener('visibilitychange', handleVis);
     };
   }, []);
 
   return (
-    <div className="liquid-backdrop-container" aria-hidden="true">
-      <canvas ref={canvasRef} className="liquid-canvas" />
-      <div className="liquid-noise-overlay" />
-      <div className="liquid-grid-overlay" />
-    </div>
+    <>
+      <canvas ref={canvasRef} className="liquid-aurora-canvas" aria-hidden="true" />
+      <div className="liquid-noise-overlay" aria-hidden="true" />
+    </>
   );
 };

@@ -180,3 +180,12 @@ export async function getAnalytics(token: string): Promise<AnalyticsData> {
   });
   return handleResponse<AnalyticsData>(res);
 }
+
+export async function seedDemoReports(token: string): Promise<{ ok: boolean; seeded_count: number }> {
+  const res = await fetch(`${BASE_URL}/moderator/seed-demo`, {
+    method: 'POST',
+    headers: authHeader(token),
+  });
+  return handleResponse<{ ok: boolean; seeded_count: number }>(res);
+}
+

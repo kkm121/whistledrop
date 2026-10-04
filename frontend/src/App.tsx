@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { LiquidBackdrop } from './components/LiquidBackdrop';
+import { CursorGlow } from './components/CursorGlow';
+import { Preloader } from './components/Preloader';
 import { Header } from './components/Header';
 import { ReportDropBox } from './components/ReportDropBox';
 import { CasePassModal } from './components/CasePassModal';
@@ -9,6 +11,10 @@ import { ModeratorStudio } from './components/ModeratorStudio';
 import { ReportSubmitResponse } from './types';
 
 export const App: React.FC = () => {
+  const [showPreloader, setShowPreloader] = useState(true);
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    return (localStorage.getItem('whistle_theme') as 'dark' | 'light') || 'dark';
+  });
   const [activeTab, setActiveTab] = useState<'submit' | 'track' | 'moderator'>('submit');
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [moderatorToken, setModeratorToken] = useState(
@@ -17,6 +23,12 @@ export const App: React.FC = () => {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [submittedPass, setSubmittedPass] = useState<ReportSubmitResponse | null>(null);
   const [prefilledTrackCode, setPrefilledTrackCode] = useState('');
+
+  // Synchronize theme with document element
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('whistle_theme', theme);
+  }, [theme]);
 
   const flashNotice = (msg: string) => {
     setToastMessage(msg);
@@ -36,7 +48,14 @@ export const App: React.FC = () => {
 
   return (
     <div className="whistle-studio-app">
+      {/* Paced 4.2-second Luxury Skippable Preloader */}
+      <AnimatePresence>
+        {showPreloader && <Preloader onDone={() => setShowPreloader(false)} />}
+      </AnimatePresence>
+
+      {/* Dynamic Colorful Liquid Mesh & Ambient Glow */}
       <LiquidBackdrop />
+      <CursorGlow />
 
       <Header
         activeTab={activeTab}
@@ -44,6 +63,8 @@ export const App: React.FC = () => {
         audioEnabled={audioEnabled}
         setAudioEnabled={setAudioEnabled}
         isModeratorAuthed={Boolean(moderatorToken)}
+        theme={theme}
+        setTheme={setTheme}
       />
 
       <main className="studio-main-content">
@@ -51,10 +72,10 @@ export const App: React.FC = () => {
           {activeTab === 'submit' && (
             <motion.div
               key="submit"
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.3 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             >
               <ReportDropBox
                 onSuccess={(res) => setSubmittedPass(res)}
@@ -66,10 +87,10 @@ export const App: React.FC = () => {
           {activeTab === 'track' && (
             <motion.div
               key="track"
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.3 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             >
               <CaseTracker
                 initialCode={prefilledTrackCode}
@@ -81,10 +102,10 @@ export const App: React.FC = () => {
           {activeTab === 'moderator' && (
             <motion.div
               key="moderator"
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.3 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             >
               <ModeratorStudio
                 token={moderatorToken}
@@ -108,7 +129,7 @@ export const App: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* Interactive Toast */}
+      {/* Interactive Toast Notification */}
       <AnimatePresence>
         {toastMessage && (
           <motion.div
@@ -125,7 +146,7 @@ export const App: React.FC = () => {
 
       <footer className="studio-footer">
         <div className="footer-content">
-          <span>WhistleDrop Architecture · 100% Cryptographic Anonymity · Multi-Task Machine Learning Engine</span>
+          <span>WhistleDrop Intelligence Architecture · 100% Zero-Footprint Anonymity · Multi-Task Machine Learning Engine</span>
           <span className="footer-tag">GDG on Campus SRM · Backend & ML Domain</span>
         </div>
       </footer>

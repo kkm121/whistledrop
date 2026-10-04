@@ -52,6 +52,7 @@ export interface ModeratorReportItem {
   created_at: string;
   updated_at: string;
   priority_score: number;
+  updates: UpdateItem[];
 }
 
 export interface PrivacyEntity {
@@ -79,15 +80,20 @@ export interface MLComprehensiveAnalysis {
     hint: string;
     top_candidates: Array<{ category: Category; probability: number }>;
   };
+  probabilities?: Record<string, number>;
   urgency: {
     risk_score: number;
     severity: Severity;
     contributing_keywords: string[];
+    urgency?: Severity;
+    explanation?: string;
   };
   department: {
     department: string;
     confidence: number;
+    suggested_department?: string;
   };
+  threat_keywords?: string[];
   privacy: PrivacyScanResult;
 }
 
@@ -102,12 +108,15 @@ export interface IncidentCluster {
   cluster_id: number;
   case_count: number;
   primary_category: string;
+  top_terms?: string[];
+  report_ids?: number[];
   cases: Array<{
     report_id: number;
     category: string;
     excerpt: string;
   }>;
 }
+
 
 export interface AnalyticsData {
   total_reports: number;

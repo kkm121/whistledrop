@@ -3,6 +3,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { trackReport } from '../lib/api';
 import { sounds } from '../lib/sound';
 import { ReportTrackResponse, Status } from '../types';
+import {
+  SearchIcon,
+  KeyIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  DownloadIcon,
+  AlertTriangleIcon,
+  ShieldCheckIcon,
+  FileTextIcon,
+} from './Icons';
 
 interface Props {
   initialCode?: string;
@@ -53,16 +63,19 @@ export const CaseTracker: React.FC<Props> = ({ initialCode = '', flashNotice }) 
   return (
     <div className="case-tracker-container">
       <section className="tracker-hero">
-        <span className="hero-kicker">CASE PROGRESS STATION</span>
+        <div className="hero-kicker-strip">
+          <span className="hero-kicker-beacon" />
+          <span className="hero-kicker">CASE PROGRESS STATION</span>
+        </div>
         <h2 className="hero-heading">Track Anonymous Investigation</h2>
         <p className="hero-tagline">
-          Enter your unique case code below to monitor investigation status and review official moderator notes.
+          Enter your unique cryptographic case code below to monitor investigation status and review official moderator notices in real-time.
         </p>
       </section>
 
       <form className="track-search-bar glass-panel" onSubmit={handleTrack}>
         <div className="search-input-group">
-          <span className="search-key-icon">🔑</span>
+          <KeyIcon size={18} className="search-key-icon-svg" />
           <input
             type="text"
             className="track-code-input"
@@ -74,7 +87,8 @@ export const CaseTracker: React.FC<Props> = ({ initialCode = '', flashNotice }) 
           />
         </div>
         <button type="submit" className="track-submit-btn" disabled={loading || !caseCode.trim()}>
-          {loading ? 'Searching...' : 'Track Progress'}
+          <SearchIcon size={15} />
+          <span>{loading ? 'Searching Vault...' : 'Track Progress'}</span>
         </button>
       </form>
 
@@ -88,7 +102,7 @@ export const CaseTracker: React.FC<Props> = ({ initialCode = '', flashNotice }) 
           >
             <div className="results-top-header">
               <div>
-                <span className="active-case-tag">CASE DOSSIER</span>
+                <span className="active-case-tag">CRYPTOGRAPHIC DOSSIER</span>
                 <h3 className="results-case-title">{searchedCode}</h3>
                 <span className="results-date">
                   Submitted {new Date(caseData.created_at).toLocaleString()}
@@ -99,110 +113,93 @@ export const CaseTracker: React.FC<Props> = ({ initialCode = '', flashNotice }) 
                 <span className={`status-pill ${caseData.status.toLowerCase()}`}>
                   {caseData.status}
                 </span>
-                <span className={`severity-pill ${caseData.severity.toLowerCase()}`}>
-                  {caseData.severity}
+                <span className="unit-pill">
+                  {caseData.department || 'Campus & Operations'}
                 </span>
               </div>
             </div>
 
-            {/* Stepper Workflow Timeline */}
-            <div className="workflow-stepper">
-              <div className="stepper-track-line">
-                <div
-                  className="stepper-fill-line"
-                  style={{
-                    width: `${(getStepIndex(caseData.status) / (STEPS.length - 1)) * 100}%`,
-                  }}
-                />
-              </div>
+            {/* Stepper Timeline Progress */}
+            <div className="investigation-stepper">
+              {STEPS.map((step, idx) => {
+                const currentIdx = getStepIndex(caseData.status);
+                const isCompleted = idx <= currentIdx;
+                const isCurrent = idx === currentIdx;
 
-              <div className="stepper-nodes-row">
-                {STEPS.map((step, idx) => {
-                  const currentIdx = getStepIndex(caseData.status);
-                  const isComplete = currentIdx >= idx;
-                  const isCurrent = currentIdx === idx;
-
-                  let label = step;
-                  if (idx === 2) {
-                    label = caseData.status === 'DISMISSED' ? 'DISMISSED' : caseData.status === 'CLOSED' ? 'CLOSED' : 'RESOLVED';
-                  }
-
-                  return (
-                    <div key={step} className={`step-node ${isComplete ? 'completed' : ''} ${isCurrent ? 'active' : ''}`}>
-                      <div className="node-circle">
-                        {isComplete ? '✓' : idx + 1}
-                      </div>
-                      <span className="node-label">{label}</span>
+                return (
+                  <div
+                    key={step}
+                    className={`stepper-step ${isCompleted ? 'completed' : ''} ${isCurrent ? 'active' : ''}`}
+                  >
+                    <div className="stepper-node">
+                      {isCompleted ? <CheckCircleIcon size={14} /> : idx + 1}
                     </div>
-                  );
-                })}
-              </div>
+                    <span className="step-label">{step.replace('_', ' ')}</span>
+                  </div>
+                );
+              })}
             </div>
 
-            {/* Permanent Case Closure Notice */}
-            {caseData.status === 'CLOSED' && caseData.closure_reason && (
-              <div className="closure-notice-box">
-                <div className="closure-header">
-                  <span className="lock-icon">🔒</span>
-                  <strong>Case Permanently Closed by Senior Investigator</strong>
+            {caseData.status === 'CLOSED' && (
+              <div className="case-closed-notice">
+                <ShieldCheckIcon size={18} />
+                <div>
+                  <strong>Investigation Formally Concluded & Closed</strong>
+                  <p>{caseData.closure_reason || 'This inquiry has reached final resolution.'}</p>
                 </div>
-                <p className="closure-body">{caseData.closure_reason}</p>
               </div>
             )}
 
-            {/* Dossier Attributes Grid */}
-            <div className="dossier-grid">
-              <div className="dossier-cell">
-                <span className="cell-label">CATEGORY</span>
-                <strong className="cell-value">{caseData.category.toUpperCase()}</strong>
+            {caseData.status === 'DISMISSED' && (
+              <div className="case-dismissed-notice">
+                <AlertTriangleIcon size={18} />
+                <div>
+                  <strong>Case Dismissed</strong>
+                  <p>Following preliminary review, this submission did not meet institutional investigation thresholds.</p>
+                </div>
               </div>
-              <div className="dossier-cell">
-                <span className="cell-label">ASSIGNED UNIT</span>
-                <strong className="cell-value">{caseData.department || 'Campus & Operations'}</strong>
-              </div>
-              <div className="dossier-cell">
-                <span className="cell-label">EVIDENCE ATTACHMENT</span>
-                <span className="cell-value">
-                  {caseData.evidence_file_name ? (
-                    <a
-                      href={`/reports/${encodeURIComponent(searchedCode)}/evidence`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="evidence-download-link"
-                    >
-                      📎 Download Evidence File
-                    </a>
-                  ) : caseData.evidence_url ? (
-                    <a
-                      href={caseData.evidence_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="evidence-download-link"
-                    >
-                      🔗 External Evidence Link
-                    </a>
-                  ) : (
-                    'None attached'
-                  )}
-                </span>
-              </div>
-            </div>
+            )}
 
-            {/* Moderator Updates Log */}
-            <div className="updates-timeline-section">
-              <h4 className="updates-heading">Investigation Activity Log</h4>
+            {/* Attached Evidence Download Link */}
+            {Boolean(caseData.evidence_file_name) && (
+              <div className="evidence-tracker-row">
+                <div className="evidence-badge-tag">
+                  <FileTextIcon size={16} />
+                  <span>Confidential Proof Document Attached</span>
+                </div>
+                <a
+                  href={`/reports/${searchedCode}/evidence`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="download-evidence-btn"
+                >
+                  <DownloadIcon size={14} />
+                  <span>Download Attached File</span>
+                </a>
+              </div>
+            )}
+
+            {/* Public Updates Log */}
+            <div className="tracker-updates-section">
+              <h4 className="updates-title">
+                <ClockIcon size={16} />
+                <span>Investigation Progress Log ({caseData.updates.length})</span>
+              </h4>
+
               {caseData.updates.length === 0 ? (
-                <p className="empty-updates-text">
-                  Your report has been logged and assigned to investigators. Status updates will appear here as the investigation unfolds.
-                </p>
+                <div className="no-updates-box">
+                  <p>No public updates posted yet. The compliance committee has received your submission and initial triage is in progress.</p>
+                </div>
               ) : (
-                <div className="updates-list">
+                <div className="tracker-timeline-list">
                   {caseData.updates.map((u, i) => (
-                    <div key={i} className="update-timeline-entry">
-                      <div className="entry-beacon" />
-                      <div className="entry-body">
-                        <span className="entry-time">{new Date(u.created_at).toLocaleString()}</span>
-                        <p className="entry-msg">{u.message}</p>
+                    <div key={i} className="tracker-timeline-item">
+                      <div className="tracker-timeline-bullet" />
+                      <div className="tracker-timeline-content">
+                        <span className="update-timestamp">
+                          {new Date(u.created_at).toLocaleString()}
+                        </span>
+                        <p className="update-body-text">{u.message}</p>
                       </div>
                     </div>
                   ))}

@@ -96,6 +96,7 @@ class ModeratorReportOut(BaseModel):
     created_at: datetime
     updated_at: datetime
     priority_score: float = 0.0
+    updates: list[UpdateOut] = []
 
 
 class StatusPatch(BaseModel):

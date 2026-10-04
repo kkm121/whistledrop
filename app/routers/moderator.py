@@ -42,6 +42,7 @@ def _out(r: Report) -> ModeratorReportOut:
         created_at=r.created_at,
         updated_at=r.updated_at,
         priority_score=ml.priority_score(r.status, r.description, len(r.updates)),
+        updates=[UpdateOut(message=u.message, created_at=u.created_at, public=u.public) for u in r.updates] if hasattr(r, "updates") and r.updates else [],
     )
 
 
@@ -240,3 +241,71 @@ def get_analytics(db: Session = Depends(get_db)):
         "by_status": by_status,
         "by_severity": by_severity,
     }
+
+
+@router.post("/seed-demo")
+def seed_demo_reports(db: Session = Depends(get_db)):
+    """Seed demonstration incident dossiers for live evaluation and visual inspection."""
+    from ..codes import generate_case_code, hash_code
+
+    demos = [
+        {
+            "category": "security",
+            "severity": "CRITICAL",
+            "department": "Cyber & InfoSec",
+            "status": "UNDER_REVIEW",
+            "description": "CRITICAL ZERO-DAY BREACH: An external threat actor gained persistent SSH root access to cluster production servers via hardcoded credentials in deployment scripts. Encrypted customer archives and database schemas were staged for exfiltration, and ransomware footprints were detected on storage volumes.",
+            "update": "Cyber Incident Response Team (CIRT) isolated affected subnets and revoked compromised access keys. Forensic analysis underway.",
+        },
+        {
+            "category": "corruption",
+            "severity": "HIGH",
+            "department": "Audit & Finance",
+            "status": "UNDER_REVIEW",
+            "description": "PROCUREMENT FRAUD: Campus facilities operations director awarded sole-source vendor HVAC and laboratory equipment maintenance contracts totaling $480,000 to an unregistered entity registered under their immediate sibling, receiving recurring wire kickbacks disguised as advisory consulting invoices.",
+            "update": "Internal Audit Committee issued formal subpoena for vendor bank transfer statements and initiated forensic accounting review.",
+        },
+        {
+            "category": "harassment",
+            "severity": "HIGH",
+            "department": "People & HR",
+            "status": "SUBMITTED",
+            "description": "RETALIATION & INTIMIDATION: Senior faculty investigator threatened junior doctoral research assistants with academic dismissal, authorship stripping, and visa cancellation after researchers documented safety protocol violations involving hazardous solvent storage.",
+            "update": "Confidential Ombudsman notified; protective interim safety protocols enacted for laboratory researchers.",
+        },
+        {
+            "category": "technical",
+            "severity": "MEDIUM",
+            "department": "Cyber & InfoSec",
+            "status": "RESOLVED",
+            "description": "UNAUTHENTICATED API EXPOSURE: The student grading portal v2 endpoint at /api/v2/records was left completely exposed without JWT validation, allowing arbitrary queries to retrieve student PII, GPA, and home contact details.",
+            "update": "Security hotfix deployed within 45 minutes; gateway authentication rules patched and ingress logs inspected for exposure.",
+        },
+    ]
+
+    seeded_ids = []
+    for d in demos:
+        raw_code = generate_case_code()
+        rep = Report(
+            code_hash=hash_code(raw_code),
+            category=d["category"],
+            description=d["description"],
+            severity=d["severity"],
+            department=d["department"],
+            status=d["status"],
+        )
+        db.add(rep)
+        db.commit()
+        db.refresh(rep)
+        
+        upd = StatusUpdate(
+            report_id=rep.id,
+            message=d["update"],
+            public=True,
+        )
+        db.add(upd)
+        db.commit()
+        seeded_ids.append(rep.id)
+
+    return {"ok": True, "seeded_count": len(seeded_ids), "report_ids": seeded_ids}
+

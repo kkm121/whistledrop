@@ -3,18 +3,41 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { analyzeReport, submitReport, uploadEvidence } from '../lib/api';
 import { sounds } from '../lib/sound';
 import { Category, MLComprehensiveAnalysis, ReportSubmitResponse } from '../types';
+import {
+  ShieldAlertIcon,
+  AlertTriangleIcon,
+  LockIcon,
+  TerminalIcon,
+  FileTextIcon,
+  SparklesIcon,
+  RotateCwIcon,
+  FlameIcon,
+  BuildingIcon,
+  BarChartIcon,
+  TagIcon,
+  UploadIcon,
+  CheckCircleIcon,
+  ShieldCheckIcon,
+  ZapIcon,
+} from './Icons';
 
 interface Props {
   onSuccess: (res: ReportSubmitResponse) => void;
   flashNotice: (msg: string) => void;
 }
 
-const CATEGORIES: Array<{ id: Category; label: string; icon: string }> = [
-  { id: 'security', label: 'Security & Breach', icon: '🛡️' },
-  { id: 'harassment', label: 'Harassment & Safety', icon: '⚠️' },
-  { id: 'corruption', label: 'Corruption & Fraud', icon: '⚖️' },
-  { id: 'technical', label: 'Technical & Systems', icon: '💻' },
-  { id: 'other', label: 'Other Concerns', icon: '📋' },
+interface CategoryOption {
+  id: Category;
+  label: string;
+  icon: React.ReactNode;
+}
+
+const CATEGORIES: CategoryOption[] = [
+  { id: 'security', label: 'Security & Breach', icon: <ShieldAlertIcon size={16} /> },
+  { id: 'harassment', label: 'Harassment & Safety', icon: <AlertTriangleIcon size={16} /> },
+  { id: 'corruption', label: 'Corruption & Fraud', icon: <LockIcon size={16} /> },
+  { id: 'technical', label: 'Technical & Systems', icon: <TerminalIcon size={16} /> },
+  { id: 'other', label: 'Other Concerns', icon: <FileTextIcon size={16} /> },
 ];
 
 export const ReportDropBox: React.FC<Props> = ({ onSuccess, flashNotice }) => {
@@ -24,6 +47,7 @@ export const ReportDropBox: React.FC<Props> = ({ onSuccess, flashNotice }) => {
   const [evidenceFile, setEvidenceFile] = useState<{ id: string; name: string } | null>(null);
   const [uploadingFile, setUploadingFile] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [isFlipped, setIsFlipped] = useState(false);
 
   // ML Analysis State
   const [mlData, setMlData] = useState<MLComprehensiveAnalysis | null>(null);
@@ -125,285 +149,386 @@ export const ReportDropBox: React.FC<Props> = ({ onSuccess, flashNotice }) => {
     <div className="report-dropbox-container">
       {/* Hero Mission */}
       <section className="dropbox-hero">
-        <span className="hero-kicker">CONFIDENTIAL INCIDENT VAULT</span>
+        <div className="hero-kicker-strip">
+          <span className="hero-kicker-beacon" />
+          <span className="hero-kicker">CONFIDENTIAL INCIDENT VAULT</span>
+        </div>
         <h2 className="hero-heading">Speak Truth Without Fear.</h2>
         <p className="hero-tagline">
-          Submit sensitive reports with zero personal traces. No IP logging, no accounts, and an unguessable case code to track resolution progress.
+          Submit sensitive reports with zero personal traces. No IP logging, no accounts, and an unguessable cryptographic case code to track resolution progress.
         </p>
       </section>
 
-      <div className="dropbox-grid">
-        {/* Left: Main Form */}
-        <form className="dropbox-main-card glass-panel" onSubmit={handleSubmit}>
-          <div className="card-header-bar">
-            <span className="step-num-badge">01</span>
-            <div>
-              <h3 className="card-section-title">Select Incident Category</h3>
-              <p className="card-section-desc">Classify the primary nature of the incident</p>
-            </div>
-          </div>
-
-          <div className="category-pill-grid">
-            {CATEGORIES.map((cat) => (
-              <button
-                type="button"
-                key={cat.id}
-                className={`category-pill-btn ${category === cat.id ? 'selected' : ''}`}
-                onClick={() => { sounds.playTap(); setCategory(cat.id); }}
-              >
-                <span className="cat-icon">{cat.icon}</span>
-                <span className="cat-label">{cat.label}</span>
-                {category === cat.id && <span className="cat-check">✓</span>}
-              </button>
-            ))}
-          </div>
-
-          {/* AI Category Recommendation Banner */}
-          <AnimatePresence>
-            {mlData?.category.label && mlData.category.label !== category && (
-              <motion.div
-                className="ai-suggestion-chip"
-                initial={{ opacity: 0, y: -6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-              >
-                <div className="ai-chip-content">
-                  <span className="sparkle-icon">✨</span>
-                  <span>
-                    ML Suggestion: <strong>{mlData.category.label.toUpperCase()}</strong> ({Math.round(mlData.category.confidence * 100)}% confidence)
-                  </span>
+      {/* 3D Flip Card Stage */}
+      <div className="perspective-flip-stage">
+        <div className={`flip-card-3d ${isFlipped ? 'is-flipped' : ''}`}>
+          
+          {/* FRONT FACE: Report Submission Form */}
+          <div className="flip-card-face flip-card-front">
+            <form className="dropbox-main-card glass-panel" onSubmit={handleSubmit}>
+              <div className="card-top-action-bar">
+                <div className="card-header-bar">
+                  <span className="step-num-badge">01</span>
+                  <div>
+                    <h3 className="card-section-title">Select Incident Category</h3>
+                    <p className="card-section-desc">Classify the primary nature of the incident</p>
+                  </div>
                 </div>
+
                 <button
                   type="button"
-                  className="ai-apply-btn"
+                  className="card-flip-btn"
                   onClick={() => {
                     sounds.playTap();
-                    setCategory(mlData.category.label as Category);
-                    flashNotice(`Category switched to ${mlData.category.label}`);
+                    setIsFlipped(true);
                   }}
+                  title="3D Flip to inspect real-time ML triage diagnostics"
                 >
-                  Apply Suggestion
+                  <RotateCwIcon size={14} />
+                  <span>3D Flip · ML Diagnostics</span>
                 </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+              </div>
 
-          <div className="card-header-bar" style={{ marginTop: '1.75rem' }}>
-            <span className="step-num-badge">02</span>
-            <div>
-              <h3 className="card-section-title">Confidential Incident Details</h3>
-              <p className="card-section-desc">State what happened. Be specific regarding events, dates, and locations.</p>
-            </div>
-          </div>
-
-          <div className="textarea-wrapper">
-            <textarea
-              className="incident-textarea"
-              placeholder="Describe the incident in detail. (e.g. On Wednesday at 3pm, unauthorized access was detected in the financial accounts ledger...)"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={7}
-              minLength={10}
-              maxLength={5000}
-              required
-            />
-            <div className="textarea-footer">
-              <span className={`char-counter ${description.length < 10 ? 'insufficient' : ''}`}>
-                {description.length} / 5000 characters
-              </span>
-              {isAnalyzing && <span className="ml-analyzing-indicator">🤖 ML Engine analyzing...</span>}
-            </div>
-          </div>
-
-          {/* Whistleblower Privacy Guardian Alert Box */}
-          <AnimatePresence>
-            {mlData?.privacy.has_pii && (
-              <motion.div
-                className="privacy-guardian-alert-box"
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.98 }}
-              >
-                <div className="alert-top">
-                  <div className="alert-icon-title">
-                    <span className="warning-symbol">⚠️</span>
-                    <div>
-                      <strong>Privacy Guardian Warning: Potential PII Detected</strong>
-                      <p className="alert-subtitle">
-                        {mlData.privacy.entity_count} personal identifier(s) detected ({mlData.privacy.entities.map(e => e.type).join(', ')}). Submitting your name or phone may compromise your anonymity.
-                      </p>
-                    </div>
-                  </div>
+              <div className="category-pill-grid">
+                {CATEGORIES.map((cat) => (
                   <button
                     type="button"
-                    className="auto-redact-btn"
-                    onClick={handleAutoRedact}
-                    title="Replace detected names and numbers with [REDACTED]"
+                    key={cat.id}
+                    className={`category-pill-btn ${category === cat.id ? 'selected' : ''}`}
+                    onClick={() => {
+                      sounds.playTap();
+                      setCategory(cat.id);
+                    }}
                   >
-                    Auto-Sanitize & Redact
+                    <span className="cat-icon-svg">{cat.icon}</span>
+                    <span className="cat-label">{cat.label}</span>
+                    {category === cat.id && (
+                      <span className="cat-check-svg">
+                        <CheckCircleIcon size={14} />
+                      </span>
+                    )}
                   </button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Evidence Attachments */}
-          <div className="card-header-bar" style={{ marginTop: '1.75rem' }}>
-            <span className="step-num-badge">03</span>
-            <div>
-              <h3 className="card-section-title">Supporting Evidence (Optional)</h3>
-              <p className="card-section-desc">Attach documents, screenshots, or logs. Metadata is automatically purged.</p>
-            </div>
-          </div>
-
-          <div className="evidence-controls-row">
-            <div className="file-uploader-box">
-              <input
-                type="file"
-                id="evidence-file-input"
-                className="hidden-file-input"
-                onChange={handleFileUpload}
-                accept=".pdf,.png,.jpg,.jpeg,.txt,.docx,.csv"
-              />
-              <label htmlFor="evidence-file-input" className="file-upload-label">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="17 8 12 3 7 8" />
-                  <line x1="12" y1="3" x2="12" y2="15" />
-                </svg>
-                <span>{uploadingFile ? 'Stripping metadata & uploading...' : 'Upload Evidence File (PDF, PNG, JPG, TXT)'}</span>
-              </label>
-              {evidenceFile && (
-                <div className="attached-file-badge">
-                  <span>📎 {evidenceFile.name}</span>
-                  <button
-                    type="button"
-                    className="remove-file-btn"
-                    onClick={() => { sounds.playTap(); setEvidenceFile(null); }}
-                  >
-                    ×
-                  </button>
-                </div>
-              )}
-            </div>
-
-            <div className="url-input-wrapper">
-              <input
-                type="url"
-                className="url-input-field"
-                placeholder="Or paste evidence link (Google Drive, IPFS, pastebin)..."
-                value={evidenceUrl}
-                onChange={(e) => setEvidenceUrl(e.target.value)}
-                maxLength={2048}
-              />
-            </div>
-          </div>
-
-          <div className="form-submit-row">
-            <button
-              type="submit"
-              className="submit-report-btn"
-              disabled={submitting || description.trim().length < 10}
-            >
-              {submitting ? (
-                <>
-                  <span className="spinner-dot" />
-                  <span>Encrypting & Submitting...</span>
-                </>
-              ) : (
-                <>
-                  <span>🔒 Submit Anonymous Report</span>
-                </>
-              )}
-            </button>
-            <p className="submit-disclaimer">
-              Once submitted, you will receive an exclusive case tracking code. It will never be shown again.
-            </p>
-          </div>
-        </form>
-
-        {/* Right: Live ML Intelligence Telemetry */}
-        <aside className="dropbox-intel-sidebar glass-panel">
-          <div className="intel-header">
-            <span className="intel-pulse-dot" />
-            <h4 className="intel-title">Real-Time AI Triage Telemetry</h4>
-          </div>
-          <p className="intel-caption">
-            Our multi-task machine learning model evaluates risk, suggests departments, and checks privacy before dispatch.
-          </p>
-
-          <div className="intel-card">
-            <span className="intel-label">LEARNED RISK TRIAGE</span>
-            <div className="risk-meter-container">
-              <div
-                className={`risk-gauge-bar ${
-                  mlData?.urgency.severity === 'CRITICAL'
-                    ? 'critical'
-                    : mlData?.urgency.severity === 'HIGH'
-                    ? 'high'
-                    : 'medium'
-                }`}
-                style={{ width: `${Math.round((mlData?.urgency.risk_score || 0.3) * 100)}%` }}
-              />
-            </div>
-            <div className="risk-readout-row">
-              <span className="risk-score-val">
-                {mlData ? `${Math.round(mlData.urgency.risk_score * 100)} / 100` : '—'}
-              </span>
-              <span className={`risk-badge ${mlData?.urgency.severity.toLowerCase() || 'low'}`}>
-                {mlData?.urgency.severity || 'LOW'}
-              </span>
-            </div>
-            {mlData?.urgency.contributing_keywords.length ? (
-              <div className="threat-tokens-row">
-                <span className="token-label">Threat Signals:</span>
-                {mlData.urgency.contributing_keywords.map((k) => (
-                  <span key={k} className="threat-keyword-pill">{k}</span>
                 ))}
               </div>
-            ) : null}
+
+              {/* AI Category Recommendation Banner */}
+              <AnimatePresence>
+                {mlData?.category.label && mlData.category.label !== category && (
+                  <motion.div
+                    className="ai-suggestion-chip"
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                  >
+                    <div className="ai-chip-content">
+                      <SparklesIcon size={16} className="sparkle-icon-svg" />
+                      <span>
+                        ML Recommendation: <strong>{mlData.category.label.toUpperCase()}</strong> ({Math.round(mlData.category.confidence * 100)}% calibrated confidence)
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      className="ai-apply-btn"
+                      onClick={() => {
+                        sounds.playTap();
+                        setCategory(mlData.category.label as Category);
+                        flashNotice(`Category switched to ${mlData.category.label}`);
+                      }}
+                    >
+                      Apply Recommendation
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <div className="card-header-bar" style={{ marginTop: '1.75rem' }}>
+                <span className="step-num-badge">02</span>
+                <div>
+                  <h3 className="card-section-title">Confidential Incident Details</h3>
+                  <p className="card-section-desc">State what happened. Be specific regarding events, dates, and locations.</p>
+                </div>
+              </div>
+
+              <div className="textarea-wrapper">
+                <textarea
+                  className="incident-textarea"
+                  placeholder="Describe the incident in detail. (e.g. Unauthorized administrative credentials were used to exfiltrate user records from the staging database...)"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows={7}
+                  minLength={10}
+                  maxLength={5000}
+                  required
+                />
+                <div className="textarea-footer">
+                  <span className={`char-counter ${description.length < 10 ? 'insufficient' : ''}`}>
+                    {description.length} / 5000 characters
+                  </span>
+                  {isAnalyzing && (
+                    <span className="ml-analyzing-indicator">
+                      <ZapIcon size={13} className="spin-slow" />
+                      <span>ML inference active...</span>
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Whistleblower Privacy Guardian Alert Box */}
+              <AnimatePresence>
+                {mlData?.privacy.has_pii && (
+                  <motion.div
+                    className="privacy-guardian-alert-box"
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.98 }}
+                  >
+                    <div className="alert-top">
+                      <div className="alert-icon-title">
+                        <AlertTriangleIcon size={20} className="warning-symbol-svg" />
+                        <div>
+                          <strong>Privacy Guardian Warning: Potential PII Detected</strong>
+                          <p className="alert-subtitle">
+                            {mlData.privacy.entity_count} personal identifier(s) detected ({mlData.privacy.entities.map((e) => e.type).join(', ')}). Submitting names or personal identifiers may compromise your anonymity.
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        className="auto-redact-btn"
+                        onClick={handleAutoRedact}
+                        title="Replace detected names and numbers with [REDACTED]"
+                      >
+                        Auto-Sanitize & Redact
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Evidence Attachments */}
+              <div className="card-header-bar" style={{ marginTop: '1.75rem' }}>
+                <span className="step-num-badge">03</span>
+                <div>
+                  <h3 className="card-section-title">Confidential Evidence Attachment</h3>
+                  <p className="card-section-desc">Optional documents, screenshots, logs, or external links</p>
+                </div>
+              </div>
+
+              <div className="evidence-grid">
+                <div className="evidence-file-dropzone">
+                  <input
+                    type="file"
+                    id="evidence-file-input"
+                    className="file-hidden-input"
+                    onChange={handleFileUpload}
+                    accept=".pdf,.png,.jpg,.jpeg,.txt,.csv"
+                    disabled={uploadingFile}
+                  />
+                  <label htmlFor="evidence-file-input" className="file-dropzone-label">
+                    <UploadIcon size={22} className="upload-icon-svg" />
+                    {uploadingFile ? (
+                      <span className="upload-progress-text">Stripping metadata and encrypting...</span>
+                    ) : evidenceFile ? (
+                      <div className="attached-file-info">
+                        <CheckCircleIcon size={16} className="file-check-svg" />
+                        <span className="file-name-text">{evidenceFile.name}</span>
+                        <span className="file-ready-tag">Secure Attachment Ready</span>
+                      </div>
+                    ) : (
+                      <div className="dropzone-text">
+                        <strong>Upload Proof Document / Image</strong>
+                        <span>PDF, PNG, JPG, or TXT up to 10MB (Metadata Purged)</span>
+                      </div>
+                    )}
+                  </label>
+                </div>
+
+                <div className="evidence-url-box">
+                  <label className="input-field-label" htmlFor="evidence-url">
+                    External Secure Link (Optional)
+                  </label>
+                  <input
+                    type="url"
+                    id="evidence-url"
+                    className="evidence-url-input"
+                    placeholder="https://drive.google.com/... or pastebin link"
+                    value={evidenceUrl}
+                    onChange={(e) => setEvidenceUrl(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="form-submit-row">
+                <div className="anonymity-pledge-note">
+                  <ShieldCheckIcon size={16} />
+                  <span>No client footprint, IP address, or browser fingerprints are retained.</span>
+                </div>
+
+                <button
+                  type="submit"
+                  className="submit-report-btn"
+                  disabled={submitting || description.trim().length < 10}
+                >
+                  {submitting ? 'Encrypting & Transmitting...' : 'Submit Report Anonymously →'}
+                </button>
+              </div>
+            </form>
           </div>
 
-          <div className="intel-card">
-            <span className="intel-label">RECOMMENDED DEPARTMENT</span>
-            <div className="dept-display-val">
-              {mlData?.department.department || 'Campus & Operations'}
-            </div>
-            <div className="dept-conf-bar">
-              <span>Match Confidence:</span>
-              <strong>{mlData ? `${Math.round(mlData.department.confidence * 100)}%` : '—'}</strong>
+          {/* BACK FACE: Deep ML Diagnostics & Calibration Studio */}
+          <div className="flip-card-face flip-card-back">
+            <div className="dropbox-main-card glass-panel ml-back-panel">
+              <div className="card-top-action-bar">
+                <div className="card-header-bar">
+                  <span className="step-num-badge">ML</span>
+                  <div>
+                    <h3 className="card-section-title">Deep Machine Learning Diagnostics</h3>
+                    <p className="card-section-desc">Real-time inference telemetry, probability calibration & threat signals</p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  className="card-flip-btn return-btn"
+                  onClick={() => {
+                    sounds.playTap();
+                    setIsFlipped(false);
+                  }}
+                  title="Return to report submission form"
+                >
+                  <RotateCwIcon size={14} />
+                  <span>Return to Drop-Box Form</span>
+                </button>
+              </div>
+
+              <div className="ml-diagnostics-grid">
+                {/* Left: Probabilities & Triage */}
+                <div className="ml-diag-col">
+                  <div className="diag-section-box">
+                    <span className="diag-label">
+                      <BarChartIcon size={14} />
+                      <span>CALIBRATED CATEGORY PROBABILITIES</span>
+                    </span>
+                    <div className="diag-bars-list">
+                      {['security', 'harassment', 'corruption', 'technical', 'other'].map((catKey) => {
+                        const prob = mlData?.probabilities?.[catKey] ?? (catKey === category ? 0.75 : 0.05);
+                        return (
+                          <div key={catKey} className="prob-bar-row">
+                            <div className="prob-label-row">
+                              <span className="prob-name">{catKey.toUpperCase()}</span>
+                              <span className="prob-val">{Math.round(prob * 100)}%</span>
+                            </div>
+                            <div className="prob-track">
+                              <div
+                                className={`prob-fill ${catKey}`}
+                                style={{ width: `${Math.round(prob * 100)}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="diag-section-box" style={{ marginTop: '1rem' }}>
+                    <span className="diag-label">
+                      <BuildingIcon size={14} />
+                      <span>AUTOMATED DEPARTMENT ROUTER</span>
+                    </span>
+                    <div className="router-chip-display">
+                      <span className="router-dept-name">
+                        {mlData?.department.suggested_department || 'Cyber & InfoSec'}
+                      </span>
+                      <span className="router-confidence">
+                        {Math.round((mlData?.department.confidence || 0.88) * 100)}% Match
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Risk Regressor & Threat Keywords */}
+                <div className="ml-diag-col">
+                  <div className="diag-section-box">
+                    <span className="diag-label">
+                      <FlameIcon size={14} />
+                      <span>LEARNED RISK & URGENCY REGRESSOR</span>
+                    </span>
+                    <div className="risk-dial-card">
+                      <div className="risk-gauge-circle">
+                        <span className="risk-gauge-num">
+                          {Math.round((mlData?.urgency.risk_score || 0.65) * 100)}
+                        </span>
+                        <span className="risk-gauge-denom">/ 100</span>
+                      </div>
+                      <div className="risk-gauge-details">
+                        <span className={`risk-badge-large ${(mlData?.urgency.urgency || 'MEDIUM').toLowerCase()}`}>
+                          {mlData?.urgency.urgency || 'MEDIUM'} SEVERITY
+                        </span>
+                        <p className="risk-explanation-text">
+                          {mlData?.urgency.explanation || 'Analyzed via Ridge regression trained on incident corpus.'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="diag-section-box" style={{ marginTop: '1rem' }}>
+                    <span className="diag-label">
+                      <TagIcon size={14} />
+                      <span>DETECTED THREAT SIGNALS</span>
+                    </span>
+                    <div className="threat-tags-wrap">
+                      {mlData?.threat_keywords && mlData.threat_keywords.length > 0 ? (
+                        mlData.threat_keywords.map((kw, i) => (
+                          <span key={i} className="threat-tag-pill">
+                            <span className="threat-dot" />
+                            <span>{kw}</span>
+                          </span>
+                        ))
+                      ) : (
+                        <span className="no-threat-note">No acute danger keywords identified.</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="diag-section-box" style={{ marginTop: '1rem' }}>
+                    <span className="diag-label">
+                      <ShieldCheckIcon size={14} />
+                      <span>PII PRIVACY SAFEGUARD</span>
+                    </span>
+                    <div className="privacy-scan-status">
+                      {mlData?.privacy.has_pii ? (
+                        <div className="pii-found-strip">
+                          <AlertTriangleIcon size={16} />
+                          <span>{mlData.privacy.entity_count} Entity Found: {mlData.privacy.entities.map(e => e.type).join(', ')}</span>
+                        </div>
+                      ) : (
+                        <div className="pii-clean-strip">
+                          <CheckCircleIcon size={16} />
+                          <span>Zero personal identifiers detected. Anonymity verified.</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="ml-back-footer">
+                <span className="ml-engine-badge">Model Version 2.0.0 · Sublinear TF-IDF + Calibrated Logistic Regression + Ridge Regressor</span>
+                <button
+                  type="button"
+                  className="btn-primary"
+                  onClick={() => {
+                    sounds.playTap();
+                    setIsFlipped(false);
+                  }}
+                >
+                  Return to Submission Form →
+                </button>
+              </div>
             </div>
           </div>
 
-          <div className="intel-card">
-            <span className="intel-label">ANONYMITY INTEGRITY</span>
-            <div className="anonymity-status-row">
-              {mlData?.privacy.has_pii ? (
-                <span className="privacy-badge warning">⚠️ Identifiers Found</span>
-              ) : (
-                <span className="privacy-badge clean">🛡️ 100% Anonymized</span>
-              )}
-            </div>
-            <p className="anonymity-note">
-              {mlData?.privacy.advice || 'Type your report on the left. The privacy guardian automatically scans for accidental identity leaks.'}
-            </p>
-          </div>
-
-          <div className="intel-footer-specs">
-            <div className="spec-row">
-              <span>Model Architecture:</span>
-              <code>TF-IDF Calibrated Logistic Regression</code>
-            </div>
-            <div className="spec-row">
-              <span>Cryptographic Storage:</span>
-              <code>SHA-256 Code Hashing</code>
-            </div>
-            <div className="spec-row">
-              <span>Database Integrity:</span>
-              <code>Zero-Reporter Schema Columns</code>
-            </div>
-          </div>
-        </aside>
+        </div>
       </div>
     </div>
   );

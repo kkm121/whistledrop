@@ -2,6 +2,14 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { sounds } from '../lib/sound';
 import { ReportSubmitResponse } from '../types';
+import {
+  LockIcon,
+  CopyIcon,
+  CheckCircleIcon,
+  DownloadIcon,
+  AlertTriangleIcon,
+  ArrowRightIcon,
+} from './Icons';
 
 interface Props {
   data: ReportSubmitResponse;
@@ -71,15 +79,14 @@ Store this file securely. It cannot be re-issued if lost.
       >
         <div className="modal-badge-row">
           <span className="secure-pass-tag">CONFIDENTIAL RECEIPT</span>
-          <button className="modal-close-x" onClick={onClose} title="Close modal">×</button>
+          <button className="modal-close-x" onClick={onClose} title="Close modal">
+            ×
+          </button>
         </div>
 
         <div className="pass-header-content">
           <div className="pass-icon-ring">
-            <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-            </svg>
+            <LockIcon size={28} />
           </div>
           <h3 className="pass-title">Incident Successfully Submitted</h3>
           <p className="pass-description">
@@ -92,7 +99,8 @@ Store this file securely. It cannot be re-issued if lost.
           <div className="code-value-row">
             <span className="case-code-string">{data.case_code}</span>
             <button className={`copy-code-btn ${copied ? 'copied' : ''}`} onClick={handleCopy}>
-              {copied ? '✓ Copied' : 'Copy Code'}
+              {copied ? <CheckCircleIcon size={14} /> : <CopyIcon size={14} />}
+              <span>{copied ? 'Copied' : 'Copy Code'}</span>
             </button>
           </div>
         </div>
@@ -117,7 +125,7 @@ Store this file securely. It cannot be re-issued if lost.
         </div>
 
         <div className="warning-callout-box">
-          <span className="warning-icon">⚠️</span>
+          <AlertTriangleIcon size={18} className="warning-callout-icon" />
           <span>
             Save this code now. To safeguard your absolute anonymity, this code will never be shown again and cannot be reset by any administrator.
           </span>
@@ -125,7 +133,8 @@ Store this file securely. It cannot be re-issued if lost.
 
         <div className="modal-button-actions">
           <button className="btn-secondary" onClick={handleDownload}>
-            Download Pass (.txt)
+            <DownloadIcon size={15} />
+            <span>Download Pass (.txt)</span>
           </button>
           <button
             className="btn-primary"
@@ -134,7 +143,8 @@ Store this file securely. It cannot be re-issued if lost.
               onTrackNow(data.case_code);
             }}
           >
-            Track Status Now →
+            <span>Track Status Now</span>
+            <ArrowRightIcon size={15} />
           </button>
         </div>
       </motion.div>
