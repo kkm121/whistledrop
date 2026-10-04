@@ -79,6 +79,62 @@ export async function getMLMetrics(): Promise<any> {
   return handleResponse<any>(res);
 }
 
+export async function analyzeStylometry(text: string): Promise<{
+  risk_score: number;
+  risk_level: string;
+  word_count: number;
+  sentence_count: number;
+  avg_sentence_length: number;
+  lexical_diversity: number;
+  readability_grade: number;
+  idiosyncratic_features: string[];
+}> {
+  const res = await fetch(`${BASE_URL}/suggest/stylometry/analyze`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text }),
+  });
+  return handleResponse(res);
+}
+
+export async function obfuscateStylometry(text: string): Promise<{
+  original_text: string;
+  obfuscated_text: string;
+  original_risk_score: number;
+  obfuscated_risk_score: number;
+  features_neutralized: string[];
+  advice: string;
+}> {
+  const res = await fetch(`${BASE_URL}/suggest/stylometry/obfuscate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text }),
+  });
+  return handleResponse(res);
+}
+
+export async function verifyZKProof(payload: {
+  domain: string;
+  commitment: string;
+  nullifier_hash: string;
+  proof_hash: string;
+}): Promise<{
+  is_valid: boolean;
+  domain?: string;
+  nullifier_hash?: string;
+  badge?: string;
+  guarantee?: string;
+  error?: string;
+}> {
+  const res = await fetch(`${BASE_URL}/suggest/zk/verify`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  return handleResponse(res);
+}
+
+
 // ----------------- Moderator APIs -----------------
 
 function authHeader(token: string) {

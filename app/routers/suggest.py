@@ -8,8 +8,16 @@ from ..schemas import (
     PrivacyScanOut,
     SuggestIn,
     SuggestOut,
+    StylometryIn,
+    StylometryAnalysisOut,
+    StylometryObfuscateOut,
+    ZKProofIn,
+    ZKProofVerifyOut,
 )
 from ..ml import service as ml
+from ..ml.stylometry import StylometricObfuscator
+from ..ml.zk_credential import ZKCredentialVerifier
+
 
 router = APIRouter(tags=["ml"])
 
@@ -75,3 +83,25 @@ def analyze_report(body: SuggestIn):
 def get_model_metrics():
     """Returns model training benchmarks, accuracy, and F1 scores."""
     return ml.get_model_metadata()
+
+
+@router.post("/suggest/stylometry/analyze", response_model=StylometryAnalysisOut)
+def analyze_stylometry(body: StylometryIn):
+    """Analyzes text for authorship attribution fingerprints and idiosyncratic markers."""
+    res = StylometricObfuscator.analyze(body.text)
+    return StylometryAnalysisOut(**res)
+
+
+@router.post("/suggest/stylometry/obfuscate", response_model=StylometryObfuscateOut)
+def obfuscate_stylometry(body: StylometryIn):
+    """Neutralizes idiosyncratic stylometry to protect whistleblower from linguistic fingerprinting."""
+    res = StylometricObfuscator.obfuscate(body.text)
+    return StylometryObfuscateOut(**res)
+
+
+@router.post("/suggest/zk/verify", response_model=ZKProofVerifyOut)
+def verify_zk_proof(body: ZKProofIn):
+    """Verifies zero-knowledge domain membership proof (ZK-Email / Semaphore)."""
+    res = ZKCredentialVerifier.verify_proof(body.model_dump())
+    return ZKProofVerifyOut(**res)
+

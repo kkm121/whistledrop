@@ -79,7 +79,10 @@ class ReportTrackResponse(BaseModel):
     evidence_url: str | None = None
     evidence_file_name: str | None = None
     closure_reason: str | None = None
-    updates: list[UpdateOut]
+    description: str | None = None
+    updates: list[UpdateOut] = []
+    is_decoy: bool = False
+
 
 
 class ModeratorReportOut(BaseModel):
@@ -157,3 +160,45 @@ class FileUploadResponse(BaseModel):
     size_bytes: int
     content_type: str
     message: str
+
+
+class StylometryIn(BaseModel):
+    text: str = Field(min_length=1, max_length=10000)
+
+
+class StylometryAnalysisOut(BaseModel):
+    risk_score: float
+    risk_level: str
+    word_count: int
+    sentence_count: int
+    avg_sentence_length: float
+    lexical_diversity: float
+    readability_grade: float
+    idiosyncratic_features: list[str]
+
+
+class StylometryObfuscateOut(BaseModel):
+    original_text: str
+    obfuscated_text: str
+    original_risk_score: float
+    obfuscated_risk_score: float
+    features_neutralized: list[str]
+    advice: str
+
+
+class ZKProofIn(BaseModel):
+    domain: str
+    commitment: str
+    nullifier_hash: str
+    proof_hash: str
+    protocol: str = "Groth16-ZK-Email"
+
+
+class ZKProofVerifyOut(BaseModel):
+    is_valid: bool
+    domain: str | None = None
+    nullifier_hash: str | None = None
+    badge: str | None = None
+    guarantee: str | None = None
+    error: str | None = None
+

@@ -20,8 +20,10 @@ from ..schemas import (
     UpdateOut,
 )
 from ..ml import service as ml
+from ..ml.honey import HoneyVault
 
 router = APIRouter(tags=["public"])
+
 
 UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "uploads")
 ALLOWED_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg", ".txt", ".docx", ".csv"}
@@ -140,7 +142,21 @@ def submit_report(body: ReportCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/reports/{case_code}", response_model=ReportTrackResponse)
+@router.get("/track/{case_code}", response_model=ReportTrackResponse)
 def track_report(case_code: str, db: Session = Depends(get_db)):
+    if HoneyVault.is_decoy(case_code):
+        decoy = HoneyVault.generate_decoy(code=case_code)
+        return ReportTrackResponse(
+            status=Status(decoy["status"]),
+            category=Category(decoy["category"]),
+            severity=Severity(decoy["severity"]),
+            department=decoy["department"],
+            created_at=decoy["created_at"],
+            description=decoy["description"],
+            updates=[UpdateOut(**u) for u in decoy["updates"]],
+            is_decoy=True,
+        )
+
     report = db.query(Report).filter_by(code_hash=hash_code(case_code)).first()
     if not report:
         raise _unknown_code()
@@ -154,12 +170,15 @@ def track_report(case_code: str, db: Session = Depends(get_db)):
         evidence_url=report.evidence_url,
         evidence_file_name=report.evidence_file_name,
         closure_reason=report.closure_reason,
+        description=report.description,
         updates=[
             UpdateOut(message=u.message, created_at=u.created_at, public=u.public)
             for u in report.updates
             if u.public
         ],
+        is_decoy=False,
     )
+
 
 
 @router.get("/reports/{case_code}/evidence")
